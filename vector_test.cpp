@@ -111,30 +111,6 @@ namespace {
 	
 
 	// This test the Constructeur and Destructeur, belong to OnOffTest test case
-	TEST(OnOffTest, Constructeur)
-	{
-		std::string v1 = "Constructeur called";
-		std::string v2 = "The output of the Constructeur";
-		EXPECT_EQ(v1, v2);
-	}
-	
-	// To test the Destructeur message -> v2 = output of the Destructeur message when it's done
-	TEST(OnOffTest, Destructeur)
-	{
-		std::string v1 = "Destructeur called";
-		std::string v2 = "The output of the Destructeur";
-		EXPECT_EQ(v1, v2);
-	}
-
-	TEST(Capacity, size)
-	{
-		std::string str = "Hello coucou tout le monde";
-		size_t v1 = str.size();
-		size_t v2 = 15;
-		// v2 = size of str caculated by ft_vector
-		EXPECT_EQ(v1, v2);
-	}
-
 
 	class VectorTest : public testing::Test
 	{
