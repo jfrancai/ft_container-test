@@ -1,15 +1,11 @@
-#include <gtest/gtest.h>
-#include <ft/vector.hpp>
-
-/*
- *
+/* 
  * Usefull links :
  * Reference Testing	: https://google.github.io/googletest/reference/testing.html
  * Reference Assertions : https://google.github.io/googletest/reference/assertions.html
- *
  */
 
-/*	Test-driven development cycle
+/*	
+ *	Test-driven development cycle
  *	
  *
  * 1.	Add a test
@@ -55,6 +51,24 @@
  *		That way, if new code fails some tests, the programmer can simply undo or revert rather than debug excessively.
  */
 
+/*
+ * TODO_LIST
+ *
+ * Constructors
+ *
+ * 	1)	vector();
+ * 	2)	vector( const vector& other );
+ * 	3)	explicit vector( const Allocator& alloc );
+ * 	4)	explicit vector( size_type count, const T& value = T(), const Allocator& alloc = Allocator());
+ * 	5)	template< class InputIt > vector( InputIt first, InputIt last, const Allocator& alloc = Allocator() );
+ *
+ * Destructors
+ *
+ */
+
+#include <gtest/gtest.h>
+#include <ft/vector.hpp>
+
 namespace {
 
 	//		To create a test:
@@ -76,6 +90,7 @@ namespace {
 		ft::vector<int> myIntVector;
 	}
 
+
 	//		To create a fixture:
 	//
 	// 1)	Derive a class from ::testing::Test.
@@ -93,4 +108,22 @@ namespace {
 	//
 	// 5)	If needed, define subroutines for your tests to share.
 
+	class VectorTest : public testing::Test
+	{
+		protected:
+			void SetUp() override
+			{
+				// Call to the default constructor.
+			}
+
+			// Declares the variables the test want to use.
+			ft::vector<int> v0_;
+	};
+
+	TEST_F(VectorTest, DefaultConstructor)
+	{
+		// We want to test the default constructor
+		EXPECT_EQ(v0_.size(), 0);
+
+	}
 }  // namespace
