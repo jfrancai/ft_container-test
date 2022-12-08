@@ -74,6 +74,7 @@ namespace {
 		// First I check if I can instanciate the vector template
 		// Before going any futher, this line should pass the test lifecycle:
 		ft::vector<int> myIntVector;
+		(void) myIntVector;
 	}
 
 	//		To create a fixture:
