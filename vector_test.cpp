@@ -133,4 +133,12 @@ namespace {
 		EXPECT_EQ(v1_.size(), (size_t)1);
 
 	}
+
+	TEST_F(VectorTest, TestingModifiers)
+	{
+		v0_.pop_back();
+		v1_.pop_back();
+		EXPECT_EQ(v0_.size(), (size_t)0);
+		EXPECT_EQ(v1_.size(), (size_t)0);
+	}
 }  // namespace
