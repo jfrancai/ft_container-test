@@ -1,4 +1,4 @@
-/* 
+/*
  * Usefull links :
  * Reference Testing	: https://google.github.io/googletest/reference/testing.html
  * Reference Assertions : https://google.github.io/googletest/reference/assertions.html
@@ -108,6 +108,7 @@ namespace {
 	// 		To learn when you should use the constructor/destructor and when you should use SetUp()/TearDown(), read the FAQ.
 	//
 	// 5)	If needed, define subroutines for your tests to share.
+	
 
 	template <typename Type>
 	class VectorTest : public testing::Test
@@ -117,14 +118,13 @@ namespace {
 			{
 				// Call to the default constructor.
 				v1_.push_back(42);
-
 				v2_.push_back(1);
 				v2_.push_back(2);
 				v2_.push_back(3);
 				v2_.push_back(4);
 			}
 
-			using Vector = ft::vector<Type>;
+		using Vector = ft::vector<Type>;
 
 		// Declares the variables the test want to use.
 		Vector v0_;
@@ -152,5 +152,30 @@ namespace {
 		EXPECT_EQ(this->v0_.size(), (size_t)0);
 		EXPECT_EQ(this->v1_.size(), (size_t)0);
 		EXPECT_EQ(this->v2_.size(), (size_t)3);
+	}
+	
+	TYPED_TEST(VectorTest, OperatorElementAccess)
+	{
+		//EXPECT_EQ(this->v0_[0], (size_t)0);
+		EXPECT_EQ(this->v1_[0], 42);
+	}
+
+	template<typename Type>
+	class VectorStringTest : public testing::Test
+	{
+		protected:
+			void SetUp() override
+			{
+			}
+			using Vector = ft::vector<Type>;
+			Vector v5_;
+	};
+
+	using StringTypes = ::testing::Types<std::string, char const *>;
+	TYPED_TEST_SUITE(VectorStringTest, StringTypes);
+
+	TYPED_TEST(VectorStringTest, TestingWithString)
+	{
+		this->v5_.push_back("cocou hello baby");
 	}
 }  // namespace
