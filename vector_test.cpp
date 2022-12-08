@@ -109,6 +109,7 @@ namespace {
 	//
 	// 5)	If needed, define subroutines for your tests to share.
 
+	template <typename Type>
 	class VectorTest : public testing::Test
 	{
 		protected:
@@ -123,29 +124,33 @@ namespace {
 				v2_.push_back(4);
 			}
 
-			// Declares the variables the test want to use.
-			ft::vector<int> v0_;
-			ft::vector<int> v1_;
-			ft::vector<int> v2_;
+			using Vector = ft::vector<Type>;
+
+		// Declares the variables the test want to use.
+		Vector v0_;
+		Vector v1_;
+		Vector v2_;
 	};
 
-	TEST_F(VectorTest, DefaultConstructor)
+	using MyTypes = ::testing::Types<int, float, double, char, wchar_t, bool>;
+	TYPED_TEST_SUITE(VectorTest, MyTypes);
+
+	TYPED_TEST(VectorTest, DefaultConstructor)
 	{
 		// We want to test the default constructor
-		EXPECT_EQ(v0_.size(), (size_t)0);
-		EXPECT_EQ(v1_.size(), (size_t)1);
-		EXPECT_EQ(v2_.size(), (size_t)4);
-
+		EXPECT_EQ(this->v0_.size(), (size_t)0);
+		EXPECT_EQ(this->v1_.size(), (size_t)1);
+		EXPECT_EQ(this->v2_.size(), (size_t)4);
 	}
 
-	TEST_F(VectorTest, TestingModifiers)
+	TYPED_TEST(VectorTest, TestingModifiers)
 	{
-		v0_.pop_back();
-		v1_.pop_back();
-		v2_.pop_back();
+		this->v0_.pop_back();
+		this->v1_.pop_back();
+		this->v2_.pop_back();
 
-		EXPECT_EQ(v0_.size(), (size_t)0);
-		EXPECT_EQ(v1_.size(), (size_t)0);
-		EXPECT_EQ(v2_.size(), (size_t)3);
+		EXPECT_EQ(this->v0_.size(), (size_t)0);
+		EXPECT_EQ(this->v1_.size(), (size_t)0);
+		EXPECT_EQ(this->v2_.size(), (size_t)3);
 	}
 }  // namespace
