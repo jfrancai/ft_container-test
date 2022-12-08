@@ -115,16 +115,19 @@ namespace {
 			void SetUp() override
 			{
 				// Call to the default constructor.
+				v1_.push_back(42);
 			}
 
 			// Declares the variables the test want to use.
 			ft::vector<int> v0_;
+			ft::vector<int> v1_;
 	};
 
 	TEST_F(VectorTest, DefaultConstructor)
 	{
 		// We want to test the default constructor
-		EXPECT_EQ(v0_.size(), 0);
+		EXPECT_EQ(v0_.size(), (size_t)0);
+		EXPECT_EQ(v1_.size(), (size_t)2);
 
 	}
 }  // namespace
