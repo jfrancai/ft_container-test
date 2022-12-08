@@ -22,6 +22,11 @@ namespace {
 	// 3)	The test’s result is determined by the assertions;
 	//		if any assertion in the test fails (either fatally or non-fatally), 
 	//		or if the test crashes, the entire test fails. Otherwise, it succeeds.
+	
+	TEST(VectorBasicTest, IsExisting)
+	{
+		ft::vector<int> myIntVector;
+	}
 
 	//		To create a fixture:
 	//
