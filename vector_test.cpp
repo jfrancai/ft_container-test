@@ -116,11 +116,17 @@ namespace {
 			{
 				// Call to the default constructor.
 				v1_.push_back(42);
+
+				v2_.push_back(1);
+				v2_.push_back(2);
+				v2_.push_back(3);
+				v2_.push_back(4);
 			}
 
 			// Declares the variables the test want to use.
 			ft::vector<int> v0_;
 			ft::vector<int> v1_;
+			ft::vector<int> v2_;
 	};
 
 	TEST_F(VectorTest, DefaultConstructor)
@@ -128,6 +134,7 @@ namespace {
 		// We want to test the default constructor
 		EXPECT_EQ(v0_.size(), (size_t)0);
 		EXPECT_EQ(v1_.size(), (size_t)1);
+		EXPECT_EQ(v2_.size(), (size_t)4);
 
 	}
 
@@ -135,7 +142,10 @@ namespace {
 	{
 		v0_.pop_back();
 		v1_.pop_back();
+		v2_.pop_back();
+
 		EXPECT_EQ(v0_.size(), (size_t)0);
 		EXPECT_EQ(v1_.size(), (size_t)0);
+		EXPECT_EQ(v2_.size(), (size_t)3);
 	}
 }  // namespace
