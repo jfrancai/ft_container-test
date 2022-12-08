@@ -132,7 +132,7 @@ namespace {
 			Vector v2_;
 	};
 
-	using MyTypes = ::testing::Types<char, int, unsigned int, long int, float, double, long double, long, unsigned long>;
+	using MyTypes = ::testing::Types</*char, */int/*, unsigned int, long int, float, double, long double, long, unsigned long*/>;
 	TYPED_TEST_SUITE(VectorTest, MyTypes);
 
 	TYPED_TEST(VectorTest, DefaultConstructor)
@@ -155,6 +155,12 @@ namespace {
 		EXPECT_EQ(this->v2_.size(), (size_t)3);
 	}
 	
+	TYPED_TEST(VectorTest, OperatorElementAccess)
+	{
+		//EXPECT_EQ(this->v0_[0], (size_t)0);
+		EXPECT_EQ(this->v1_[0], 42);
+	}
+
 	template<typename Type>
 	class VectorStringTest : public testing::Test
 	{
