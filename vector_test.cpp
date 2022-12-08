@@ -120,10 +120,10 @@ namespace {
 				// Call to the default constructor.
 				v1_.push_back(42);
 
-				v2.push_back(1);
-				v2.push_back(2);
-				v2.push_back(3);
-				v2.push_back(4);
+				v2_.push_back(1);
+				v2_.push_back(2);
+				v2_.push_back(3);
+				v2_.push_back(4);
 			}
 
 			// Declares the variables the test want to use.
