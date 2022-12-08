@@ -111,7 +111,8 @@ namespace {
 	
 
 	// This test the Constructeur and Destructeur, belong to OnOffTest test case
-
+	//
+	template<typename Type>
 	class VectorTest : public testing::Test
 	{
 		protected:
@@ -119,36 +120,58 @@ namespace {
 			{
 				// Call to the default constructor.
 				v1_.push_back(42);
-
 				v2_.push_back(1);
 				v2_.push_back(2);
 				v2_.push_back(3);
 				v2_.push_back(4);
 			}
-
 			// Declares the variables the test want to use.
-			ft::vector<int> v0_;
-			ft::vector<int> v1_;
-			ft::vector<int> v2_;
+			using Vector = ft::vector<Type>;
+			Vector v0_;
+			Vector v1_;
+			Vector v2_;
 	};
 
-	TEST_F(VectorTest, DefaultConstructor)
+	using MyTypes = ::testing::Types<char, int, unsigned int, long int, float, double, long double, long, unsigned long>;
+	TYPED_TEST_SUITE(VectorTest, MyTypes);
+
+	TYPED_TEST(VectorTest, DefaultConstructor)
 	{
 		// We want to test the default constructor
-		EXPECT_EQ(v0_.size(), (size_t)0);
-		EXPECT_EQ(v1_.size(), (size_t)1);
-		EXPECT_EQ(v2_.size(), (size_t)4);
+		EXPECT_EQ(this->v0_.size(), (size_t)0);
+		EXPECT_EQ(this->v1_.size(), (size_t)1);
+		EXPECT_EQ(this->v2_.size(), (size_t)4);
 
 	}
 
-	TEST_F(VectorTest, TestingModifiers)
+	TYPED_TEST(VectorTest, TestingModifiers)
 	{
-		v0_.pop_back();
-		v1_.pop_back();
-		v2_.pop_back();
+		this->v0_.pop_back();
+		this->v1_.pop_back();
+		this->v2_.pop_back();
 
-		EXPECT_EQ(v0_.size(), (size_t)0);
-		EXPECT_EQ(v1_.size(), (size_t)0);
-		EXPECT_EQ(v2_.size(), (size_t)3);
+		EXPECT_EQ(this->v0_.size(), (size_t)0);
+		EXPECT_EQ(this->v1_.size(), (size_t)0);
+		EXPECT_EQ(this->v2_.size(), (size_t)3);
+	}
+	
+	template<typename Type>
+	class VectorStringTest : public testing::Test
+	{
+		protected:
+			void SetUp() override
+			{
+			}
+			using Vector = ft::vector<Type>;
+			Vector v5_;
+	};
+
+	using StringTypes = ::testing::Types<std::string, char const *>;
+	TYPED_TEST_SUITE(VectorStringTest, StringTypes);
+
+	TYPED_TEST(VectorStringTest, TestingWithString)
+	{
+		this->v5_.push_back("cocou hello baby");
+
 	}
 }  // namespace
