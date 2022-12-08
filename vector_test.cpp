@@ -127,7 +127,7 @@ namespace {
 	{
 		// We want to test the default constructor
 		EXPECT_EQ(v0_.size(), (size_t)0);
-		EXPECT_EQ(v1_.size(), (size_t)2);
+		EXPECT_EQ(v1_.size(), (size_t)1);
 
 	}
 }  // namespace
