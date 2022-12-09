@@ -156,9 +156,20 @@ namespace {
 	
 	TYPED_TEST(VectorTest, OperatorElementAccess)
 	{
-		//EXPECT_EQ(this->v0_[0], (size_t)0);
+		//v0
+		EXPECT_EQ(this->v0_[0], 0); // This is undefined behavior, when you test with the real vector it segfault.
+
+		//v1
 		EXPECT_EQ(this->v1_[0], 42);
 		EXPECT_EQ(this->v1_[1], 0);
+
+		//v2
+		EXPECT_EQ(this->v2_[0], 0);
+		EXPECT_EQ(this->v2_[1], 1);
+		EXPECT_EQ(this->v2_[2], 2);
+		EXPECT_EQ(this->v2_[3], 3);
+		EXPECT_EQ(this->v2_[4], 4);
+		EXPECT_EQ(this->v2_[5], 0);
 	}
 
 	/*
