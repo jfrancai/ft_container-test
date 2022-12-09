@@ -156,7 +156,7 @@ namespace {
 	
 	TYPED_TEST(VectorTest, OperatorElementAccess)
 	{
-		//EXPECT_EQ(this->v0_[0], (size_t)0);
+		EXPECT_EQ(this->v0_[0], 0);
 		EXPECT_EQ(this->v1_[0], 42);
 	}
 /*
