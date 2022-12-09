@@ -114,16 +114,14 @@ namespace {
 	class VectorTest : public testing::Test
 	{
 		protected:
+			const Type lenv2 = 7;
 			void SetUp() override
 			{
 				// Call to the default constructor.
 				v1_.push_back(42);
-				v2_.push_back(1);
-				v2_.push_back(2);
-				v2_.push_back(3);
-				v2_.push_back(4);
-				v2_.push_back(5);
-				v2_.push_back(6);
+
+				for (Type i = 1; i <= lenv2; i++)
+					v2_.push_back(i);
 			}
 
 		using Vector = ft::vector<Type>;
@@ -134,7 +132,12 @@ namespace {
 		Vector v2_;
 	};
 
-	using MyTypes = ::testing::Types< int/*, float, double, char, wchar_t, bool*/ >;
+#ifdef INT_ONLY
+	using MyTypes = ::testing::Types< int >;
+#else
+	using MyTypes = ::testing::Types< int, float, double, char, wchar_t>;
+#endif
+
 	TYPED_TEST_SUITE(VectorTest, MyTypes);
 
 	TYPED_TEST(VectorTest, DefaultConstructor)
@@ -142,7 +145,7 @@ namespace {
 		// We want to test the default constructor
 		EXPECT_EQ(this->v0_.size(), (size_t)0);
 		EXPECT_EQ(this->v1_.size(), (size_t)1);
-		EXPECT_EQ(this->v2_.size(), (size_t)4);
+		EXPECT_EQ(this->v2_.size(), (size_t)7);
 	}
 
 	TYPED_TEST(VectorTest, TestingModifiers)
@@ -153,7 +156,7 @@ namespace {
 
 		EXPECT_EQ(this->v0_.size(), (size_t)0);
 		EXPECT_EQ(this->v1_.size(), (size_t)0);
-		EXPECT_EQ(this->v2_.size(), (size_t)3);
+		EXPECT_EQ(this->v2_.size(), (size_t)6);
 	}
 	
 	TYPED_TEST(VectorTest, OperatorElementAccess)
@@ -166,14 +169,9 @@ namespace {
 		EXPECT_EQ(this->v1_[1], 0);
 
 		//v2
-		EXPECT_EQ(this->v2_[0], 0);
-		EXPECT_EQ(this->v2_[1], 1);
-		EXPECT_EQ(this->v2_[2], 2);
-		EXPECT_EQ(this->v2_[3], 3);
-		EXPECT_EQ(this->v2_[4], 4);
-		EXPECT_EQ(this->v2_[42], 0);
-		EXPECT_EQ(this->v2_[6], 0);
-		EXPECT_EQ(this->v2_[7], 0);
+		for (int i = 0; i < this->lenv2; i++)
+			EXPECT_EQ(this->v2_[i], i + 1);
+		EXPECT_EQ(this->v2_[this->lenv2], 0);
 	}
 
 	/*
