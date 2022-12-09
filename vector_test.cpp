@@ -122,6 +122,8 @@ namespace {
 				v2_.push_back(2);
 				v2_.push_back(3);
 				v2_.push_back(4);
+				v2_.push_back(5);
+				v2_.push_back(6);
 			}
 
 		using Vector = ft::vector<Type>;
@@ -132,7 +134,7 @@ namespace {
 		Vector v2_;
 	};
 
-	using MyTypes = ::testing::Types<int/*, float, double, char, wchar_t, bool*/>;
+	using MyTypes = ::testing::Types< int/*, float, double, char, wchar_t, bool*/ >;
 	TYPED_TEST_SUITE(VectorTest, MyTypes);
 
 	TYPED_TEST(VectorTest, DefaultConstructor)
@@ -169,7 +171,9 @@ namespace {
 		EXPECT_EQ(this->v2_[2], 2);
 		EXPECT_EQ(this->v2_[3], 3);
 		EXPECT_EQ(this->v2_[4], 4);
-		EXPECT_EQ(this->v2_[5], 0);
+		EXPECT_EQ(this->v2_[42], 0);
+		EXPECT_EQ(this->v2_[6], 0);
+		EXPECT_EQ(this->v2_[7], 0);
 	}
 
 	/*
