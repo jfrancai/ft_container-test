@@ -115,7 +115,7 @@ namespace {
 	class VectorTest : public testing::Test
 	{
 		protected:
-			const static Type lenv2 = 7;
+			const static int lenv2 = 7;
 			void SetUp()
 			{
 				// Call to the default constructor.
