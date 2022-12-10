@@ -132,7 +132,7 @@ namespace {
 		Vector v2_;
 	};
 
-#ifdef INT_TYPE
+#ifdef INT_ONLY
 	using MyTypes = ::testing::Types< int >;
 #else
 	using MyTypes = ::testing::Types< int, float, double, char, wchar_t>;
