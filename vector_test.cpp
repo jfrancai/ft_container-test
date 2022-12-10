@@ -66,6 +66,7 @@
  *
  */
 
+
 #include <gtest/gtest.h>
 #include <ft/vector.hpp>
 
@@ -114,8 +115,8 @@ namespace {
 	class VectorTest : public testing::Test
 	{
 		protected:
-			const Type lenv2 = 7;
-			void SetUp() override
+			const static Type lenv2 = 7;
+			void SetUp()
 			{
 				// Call to the default constructor.
 				v1_.push_back(42);
@@ -124,7 +125,7 @@ namespace {
 					v2_.push_back(i);
 			}
 
-		using Vector = ft::vector<Type>;
+		typedef ft::vector<Type> Vector;
 
 		// Declares the variables the test want to use.
 		Vector v0_;
@@ -133,12 +134,12 @@ namespace {
 	};
 
 #ifdef INT_ONLY
-	using MyTypes = ::testing::Types< int >;
+	typedef testing::Types< int > MyTypes;
 #else
-	using MyTypes = ::testing::Types< int, float, double, char, wchar_t>;
+	typedef testing::Types< int, float, double, char, wchar_t> MyTypes;
 #endif
 
-	TYPED_TEST_SUITE(VectorTest, MyTypes);
+	TYPED_TEST_CASE(VectorTest, MyTypes);
 
 	TYPED_TEST(VectorTest, DefaultConstructor)
 	{
