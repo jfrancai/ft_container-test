@@ -132,7 +132,7 @@ namespace {
 	};
 
 #ifdef INT_ONLY
-	using MyTypes = ::testing::Types<int/*, float, double, char, wchar_t, bool*/>;
+	using MyTypes = ::testing::Types< int >;
 #else
 	using MyTypes = ::testing::Types< int, float, double, char, wchar_t >;
 #endif
