@@ -174,6 +174,20 @@ namespace {
 		EXPECT_EQ(this->v2_[this->lenv2], 0);
 	}
 
+	TYPED_TEST(VectorTest, OperatorElementAccess)
+	{
+		this->v0_.pop_back();
+		this->v0_.pop_back();
+		this->v0_.pop_back();
+		this->v1_.pop_back();
+		this->v2_.pop_back();
+		this->v3_.pop_back();
+		
+		EXPECT_EQ(this->v0_[0], 0);
+		EXPECT_EQ(this->v1_[0], 0);
+		EXPECT_EQ(this->v2_[0], 0);
+		EXPECT_EQ(this->v3_[0], 0);
+	}
 	/*
 	template<typename Type>
 	class VectorStringTest : public testing::Test
