@@ -111,6 +111,7 @@ namespace {
 	// 5)	If needed, define subroutines for your tests to share.
 	
 
+	/*
 	template <typename Type>
 	class VectorTest : public testing::Test
 	{
@@ -118,8 +119,16 @@ namespace {
 			const static int lenv2 = 7;
 			void SetUp()
 			{
-				// Call to the default constructor.
+				// We don't expect the data to be initialized at the start, so we do:
+				// 		It is undefined behavior to do such thing, vector size is 0.
+				// 		It's working only because we are dealing with default types.
+				this->v0_[0] = 0;
+				this->v0_[0] = 0;
+
 				v1_.push_back(42);
+				// Same here: undefined behavior in the real world, testing purpose only:
+				v1_[1] = 0;
+
 				for (Type i = 1; i <= lenv2; i++)
 					v2_.push_back(i);
 			}
@@ -137,18 +146,31 @@ namespace {
 #else
 	typedef testing::Types< int, float, double, char, wchar_t> MyTypes;
 #endif
-
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
-	TYPED_TEST(VectorTest, DefaultConstructor)
+	TYPED_TEST(VectorTest, TestDefaultConstructor)
 	{
-		// We want to test the default constructor
+		EXPECT_EQ(this->v0_.size(), (size_t)0);
+
+		EXPECT_EQ(this->v0_[0], 0);
+		EXPECT_EQ(this->v0_[0], 0);
+
+		// Testing to remove elements on an empty vector:
+		this->v0_.pop_back();
+		this->v0_.pop_back();
+		this->v0_.pop_back();
+
+		EXPECT_EQ(this->v0_.size(), (size_t)0);
+	}
+
+	TYPED_TEST(VectorTest, TestCapacitySize)
+	{
 		EXPECT_EQ(this->v0_.size(), (size_t)0);
 		EXPECT_EQ(this->v1_.size(), (size_t)1);
 		EXPECT_EQ(this->v2_.size(), (size_t)7);
 	}
 
-	TYPED_TEST(VectorTest, TestingModifiers)
+	TYPED_TEST(VectorTest, TestModifierPopBack)
 	{
 		this->v0_.pop_back();
 		this->v1_.pop_back();
@@ -159,11 +181,8 @@ namespace {
 		EXPECT_EQ(this->v2_.size(), (size_t)6);
 	}
 	
-	TYPED_TEST(VectorTest, OperatorElementAccess)
+	TYPED_TEST(VectorTest, TestOperatorElementAccess)
 	{
-		//v0
-		EXPECT_EQ(this->v0_[0], 0); // This is undefined behavior, when you test with the real vector it segfault.
-
 		//v1
 		EXPECT_EQ(this->v1_[0], 42);
 		EXPECT_EQ(this->v1_[1], 0);
@@ -171,7 +190,6 @@ namespace {
 		//v2
 		for (int i = 0; i < this->lenv2; i++)
 			EXPECT_EQ(this->v2_[i], i + 1);
-		EXPECT_EQ(this->v2_[this->lenv2], 0);
 	}
 
 	TYPED_TEST(VectorTest, OperatorElementAccess)
@@ -181,30 +199,69 @@ namespace {
 		this->v0_.pop_back();
 		this->v1_.pop_back();
 		this->v2_.pop_back();
-		this->v3_.pop_back();
 		
 		EXPECT_EQ(this->v0_[0], 0);
 		EXPECT_EQ(this->v1_[0], 0);
 		EXPECT_EQ(this->v2_[0], 0);
-		EXPECT_EQ(this->v3_[0], 0);
 	}
-	/*
+	*/
 	template<typename Type>
-	class VectorStringTest : public testing::Test
+	class VectorTestString: public testing::Test
 	{
 		protected:
-			void SetUp() override
+			void SetUp()
 			{
+				const char *myConstString = "toto";
+				//std::string * = const char * WTF
+				this->v4_[0] = myConstString;
+				// Default capacity is 2
+	//			this->v5_.push_back("First sentence.");
+	//			this->v5_.push_back("An other sentence.");
+	//			// Now it should resize the capacity to 4
+	//			this->v5_.push_back("And a third one.");
 			}
-			using Vector = ft::vector<Type>;
-			Vector v5_;
+			typedef ft::vector<Type> Vector;
+			Vector v4_;
+	//		Vector v5_;
 	};
 
-	using StringTypes = ::testing::Types<std::string, char const *>;
-	TYPED_TEST_SUITE(VectorStringTest, StringTypes);
+	typedef testing::Types< std::string > StringTypes;
+	TYPED_TEST_CASE(VectorTestString, StringTypes);
 
-	TYPED_TEST(VectorStringTest, TestingWithString)
+	TYPED_TEST(VectorTestString, TestStringDefaultConstructor)
 	{
-		this->v5_.push_back("cocou hello baby");
+		EXPECT_EQ(this->v4_.size(), (size_t)1);
+		//Test segfault here :
+		EXPECT_EQ(this->v4_[0], "toto");
+
+//		// Testing to remove elements on an empty vector:
+//		this->v4_.pop_back();
+//		this->v4_.pop_back();
+//		this->v4_.pop_back();
+	}
+
+	/*
+	TYPED_TEST(VectorTestString, TestStringSize)
+	{
+		EXPECT_EQ(this->v5_.size(), (size_t)3);
+		this->v5_.push_back("Toto is now inside vector");
+		EXPECT_EQ(this->v5_.size(), (size_t)4);
+		this->v5_.pop_back();
+		this->v5_.pop_back();
+		EXPECT_EQ(this->v5_.size(), (size_t)2);
+	}
+
+	TYPED_TEST(VectorTestString, TestStringPushBack)
+	{
+		EXPECT_STREQ(this->v5_[0].c_str(), "First sentence.");
+		EXPECT_STREQ(this->v5_[1].c_str(), "An other sentence.");
+		EXPECT_STREQ(this->v5_[2].c_str(), "And a third one.");
+		this->v5_.push_back("Toto is now inside vector");
+		EXPECT_STREQ(this->v5_[3].c_str(), "Toto is now inside vector");
+		this->v5_[0] = "Assignment operator= of std::string is now tested";
+		EXPECT_STREQ(this->v5_[0].c_str(), "Assignment operator= of std::string is now tested");
+		// This Test should fail since we can not instantiate an std::string with a NULL pointer.
+	    //this->v5_.push_back(NULL);
+	}
 	*/
 }  // namespace
