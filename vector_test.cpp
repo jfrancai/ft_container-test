@@ -329,7 +329,7 @@ namespace {
 			.Times(1);
 		EXPECT_CALL(mAlloc, construct(mVector.getElements(), "toto is born"))
 			.Times(1);
-		EXPECT_CALL(mAlloc, Die());
+		EXPECT_CALL(mAlloc, Die())
 			.Times(1);
 		EXPECT_CALL(mVector, Die())
 			.Times(1);
