@@ -221,7 +221,6 @@ namespace {
 		EXPECT_EQ(this->mv1_.size(), (size_t)1);
 		EXPECT_EQ(this->mv2_.size(), (size_t)7);
 	}
-	/*
 
 	TYPED_TEST(VectorTest, TestModifierPopBack)
 	{
