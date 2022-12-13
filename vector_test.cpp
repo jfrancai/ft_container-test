@@ -67,10 +67,34 @@
  */
 
 
+// Testing Library
 #include <gtest/gtest.h>
+// Mocking Library
+#include "gmock/gmock.h"
+// The tested Library
 #include <ft/vector.hpp>
 
 namespace {
+
+	// Writing The Mock Class Template
+	template< class Type, class Allocator = std::allocator<Type> >
+	class MockVector : public ft::vector< Type, Allocator >{
+		public:
+			MockVector(void) : ft::vector< Type, Allocator >(){}
+
+			virtual ~MockVector(void)
+			{
+				Die();
+			}
+
+			/*
+			 * Member functions
+			 */
+
+			// Destructors
+			MOCK_METHOD0_T(Die, void(void));
+			MOCK_CONST_METHOD0_T(size, size_t());
+	};
 
 	//		To create a test:
 	//
@@ -88,8 +112,14 @@ namespace {
 	{
 		// First I check if I can instanciate the vector template
 		// Before going any futher, this line should pass the test lifecycle:
-		ft::vector<int> myIntVector;
-		(void) myIntVector;
+		//ft::vector< int > myIntVector;
+		//(void) myIntVector;
+
+		// Then use the mockclass to check for constructor call
+		MockVector< int >	myMockIntVectorPointer;
+
+		EXPECT_CALL(myMockIntVectorPointer, Die())
+			.Times(1);
 	}
 
 
@@ -121,23 +151,36 @@ namespace {
 				// We don't expect the data to be initialized at the start, so we do:
 				// 		It is undefined behavior to do such thing, vector size is 0.
 				// 		It's working only because we are dealing with default types.
-				this->v0_[0] = 0;
-				this->v0_[0] = 0;
+				this->mv0_[0] = 0;
+				this->mv0_[0] = 0;
 
-				v1_.push_back(42);
+				mv1_.push_back(42);
 				// Same here: undefined behavior in the real world, testing purpose only:
-				v1_[1] = 0;
+				mv1_[1] = 0;
 
 				for (Type i = 1; i <= lenv2; i++)
-					v2_.push_back(i);
+				{
+					mv2_.push_back(i);
+					std::cout << mv2_.size() << std::cout;
+				}
+			}
+
+			void TearDown()
+			{
+				// Die is the function called inside the MockVector destructor,
+				// so we can be sure that the vector destructor is also called.
+				EXPECT_CALL(mv0_, Die()).Times(1);
+				EXPECT_CALL(mv1_, Die()).Times(1);
+				EXPECT_CALL(mv2_, Die()).Times(1);
 			}
 
 		typedef ft::vector<Type> Vector;
+		typedef MockVector<Type> MockVector;
 
 		// Declares the variables the test want to use.
-		Vector v0_;
-		Vector v1_;
-		Vector v2_;
+		MockVector mv0_;
+		MockVector mv1_;
+		MockVector mv2_;
 	};
 
 #ifdef INT_ONLY
@@ -149,46 +192,60 @@ namespace {
 
 	TYPED_TEST(VectorTest, TestDefaultConstructor)
 	{
-		EXPECT_EQ(this->v0_.size(), (size_t)0);
+		EXPECT_CALL(this->mv0_, size()).Times(2);
+		EXPECT_CALL(this->mv1_, size()).Times(0);
+		EXPECT_CALL(this->mv2_, size()).Times(0);
 
-		EXPECT_EQ(this->v0_[0], 0);
-		EXPECT_EQ(this->v0_[0], 0);
+		EXPECT_EQ(this->mv0_.size(), (size_t)0);
+
+
+		EXPECT_EQ(this->mv0_[0], 0);
+		EXPECT_EQ(this->mv0_[0], 0);
 
 		// Testing to remove elements on an empty vector:
-		this->v0_.pop_back();
-		this->v0_.pop_back();
-		this->v0_.pop_back();
+		this->mv0_.pop_back();
+		this->mv0_.pop_back();
+		this->mv0_.pop_back();
 
-		EXPECT_EQ(this->v0_.size(), (size_t)0);
+		EXPECT_EQ(this->mv0_.size(), (size_t)0);
 	}
 
 	TYPED_TEST(VectorTest, TestCapacitySize)
 	{
-		EXPECT_EQ(this->v0_.size(), (size_t)0);
-		EXPECT_EQ(this->v1_.size(), (size_t)1);
-		EXPECT_EQ(this->v2_.size(), (size_t)7);
+		EXPECT_CALL(this->mv0_, size()).Times(1);
+		EXPECT_CALL(this->mv1_, size()).Times(1);
+		EXPECT_CALL(this->mv2_, size()).Times(1);
+
+		EXPECT_EQ(this->mv0_.size(), (size_t)0);
+		EXPECT_EQ(this->mv1_.size(), (size_t)1);
+		EXPECT_EQ(this->mv2_.size(), (size_t)7);
 	}
+	/*
 
 	TYPED_TEST(VectorTest, TestModifierPopBack)
 	{
-		this->v0_.pop_back();
-		this->v1_.pop_back();
-		this->v2_.pop_back();
+		EXPECT_CALL(this->mv0_, size()).Times(1);
+		EXPECT_CALL(this->mv1_, size()).Times(1);
+		EXPECT_CALL(this->mv2_, size()).Times(1);
 
-		EXPECT_EQ(this->v0_.size(), (size_t)0);
-		EXPECT_EQ(this->v1_.size(), (size_t)0);
-		EXPECT_EQ(this->v2_.size(), (size_t)6);
+		this->mv0_.pop_back();
+		this->mv1_.pop_back();
+		this->mv2_.pop_back();
+
+		EXPECT_EQ(this->mv0_.size(), (size_t)0);
+		EXPECT_EQ(this->mv1_.size(), (size_t)0);
+		EXPECT_EQ(this->mv2_.size(), (size_t)6);
 	}
 	
 	TYPED_TEST(VectorTest, TestOperatorElementAccess)
 	{
 		//v1
-		EXPECT_EQ(this->v1_[0], 42);
-		EXPECT_EQ(this->v1_[1], 0);
+		EXPECT_EQ(this->mv1_[0], 42);
+		EXPECT_EQ(this->mv1_[1], 0);
 
 		//v2
 		for (int i = 0; i < this->lenv2; i++)
-			EXPECT_EQ(this->v2_[i], i + 1);
+			EXPECT_EQ(this->mv2_[i], i + 1);
 	}
 
 	template<typename Type>
@@ -245,4 +302,5 @@ namespace {
 		// This Test should fail since we can not instantiate an std::string with a NULL pointer.
 	    //this->v5_.push_back(NULL);
 	}
+	*/
 }  // namespace
