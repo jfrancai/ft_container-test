@@ -189,18 +189,27 @@ namespace {
 				// so we can be sure that the allocator destructor is also called.
 				EXPECT_CALL(mAlloc_, Die())
 					.Times(1);
+				EXPECT_CALL(mv0_, Die())
+					.Times(1);
+				EXPECT_CALL(mv1_, Die())
+					.Times(1);
 			}
 
-		typedef ft::vector<Type> Vector;
-		typedef MockAllocator<Type> MockAlloc;
-
+		typedef ft::vector< Type > Vector;
+		typedef MockAllocator< Type > MockAlloc;
+		typedef MockVector< Type, MockAlloc > MockVector;
 		// Declares the variables the test want to use.
 		Vector v0_;
 		Vector v1_;
 		Vector v2_;
 
 		MockAlloc mAlloc_;
+		MockVector & mv0_;
+		MockVector & mv1_;
 	};
+
+MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc0 = this->mv0_.getAlloc();
+MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc1 = this->mv1_.getAlloc();
 
 #ifdef INT_ONLY
 	typedef testing::Types< int > MyTypes;
@@ -242,6 +251,28 @@ namespace {
 		EXPECT_EQ(this->v2_.size(), (size_t)6);
 	}
 	
+	//test Operator = // vector& operator=( const vector& other );
+	TYPED_TEST(VectorTest, 1TestOperatorEQ)
+	{
+/*
+		EXPECT_CALL(mAlloc, destroy(mVector.getElements()))
+			.Times(1);
+		EXPECT_CALL(mAlloc, construct(mVector.getElements(), "toto is born"))
+			.Times(1);
+		EXPECT_CALL(mAlloc, Die())
+			.Times(1);
+		EXPECT_CALL(mVector, Die())
+			.Times(1);
+*/
+		this->v0_ = this->v2_;
+
+		size_t k = this->v0_.size();
+		ASSERT_EQ(k, this->v2_.size());
+		for (size_t i = 0; i < k; i++)
+			EXPECT_EQ(this->v0_[i], this->v2_[i]); 
+		
+	}
+
 	TYPED_TEST(VectorTest, TestOperatorElementAccess)
 	{
 		//v1
@@ -336,4 +367,5 @@ namespace {
 
 		mVector.push_back("toto is born");
 	}
+	
 }  // namespace
