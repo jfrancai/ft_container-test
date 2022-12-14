@@ -189,27 +189,18 @@ namespace {
 				// so we can be sure that the allocator destructor is also called.
 				EXPECT_CALL(mAlloc_, Die())
 					.Times(1);
-				EXPECT_CALL(mv0_, Die())
-					.Times(1);
-				EXPECT_CALL(mv1_, Die())
-					.Times(1);
 			}
 
 		typedef ft::vector< Type > Vector;
 		typedef MockAllocator< Type > MockAlloc;
-		typedef MockVector< Type, MockAlloc > MockVector;
 		// Declares the variables the test want to use.
 		Vector v0_;
 		Vector v1_;
 		Vector v2_;
 
 		MockAlloc mAlloc_;
-		MockVector & mv0_;
-		MockVector & mv1_;
 	};
 
-MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc0 = this->mv0_.getAlloc();
-MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc1 = this->mv1_.getAlloc();
 
 #ifdef INT_ONLY
 	typedef testing::Types< int > MyTypes;
@@ -265,11 +256,16 @@ MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc1 = this->
 			.Times(1);
 */
 		this->v0_ = this->v2_;
+		this->v1_ = this->v2_;
 
 		size_t k = this->v0_.size();
 		ASSERT_EQ(k, this->v2_.size());
 		for (size_t i = 0; i < k; i++)
 			EXPECT_EQ(this->v0_[i], this->v2_[i]); 
+		size_t h = this->v1_.size();
+		ASSERT_EQ(h, this->v2_.size());
+		for (size_t i = 0; i < h; i++)
+			EXPECT_EQ(this->v1_[i], this->v2_[i]); 
 		
 	}
 
