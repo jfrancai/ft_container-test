@@ -214,9 +214,9 @@ namespace {
 			{
 				// Die is the function called inside the MockAllocator destructor,
 				// so we can be sure that the allocator destructor is also called.
-				EXPECT_CALL(mAlloc0_, deallocate(mv0_.getElements(), v0_.getCapacity()))
+				EXPECT_CALL(mAlloc0_, deallocate(mv0_.getElements(), mv0_.getCapacity()))
 					.Times(1);
-				EXPECT_CALL(mAlloc1_, deallocate(mv1_.getElements(), v1_.getCapacity()))
+				EXPECT_CALL(mAlloc1_, deallocate(mv1_.getElements(), mv1_.getCapacity()))
 					.Times(1);
 			}
 
@@ -283,12 +283,34 @@ namespace {
 	//test Operator = // vector& operator=( const vector& other );
 	TYPED_TEST(VectorTest, 1TestOperatorEQ)
 	{
-		//size_t mv0Size = this->mv0_.size();
-		size_t mv1Size = this->mv1_.size();
+		this->mv1_.push_back(2);
+		this->mv1_.push_back(222);
+		this->mv1_.push_back(420);
+		this->mv0_.push_back(12);
+		this->mv0_.push_back(22);
+		this->mv0_.push_back(32);
+		this->mv0_.push_back(42);
+		this->mv0_.push_back(4);
 
-		EXPECT_CALL(this->mAlloc0_, allocate(mv1Size))
+		size_t mv0Size = this->mv0_.size();
+		//size_t mv1Size = this->mv1_.size();
+		size_t mv1capacity = this->mv1_.getCapacity();
+		size_t mv0capacity = this->mv0_.getCapacity();
+
+		TypeParam * Elements = this->mv0_.getElements();
+		std::cout << "adress of the first Element = " << Elements << std::endl;
+		for (size_t i = 0; i < mv0Size; i++)
+			EXPECT_CALL(this->mAlloc0_, destroy(Elements + i))
+				.Times(1);
+		EXPECT_CALL(this->mAlloc0_, deallocate(Elements, mv0capacity))
 			.Times(AtLeast(1));
-		//this->v0_ = this->v2_;
+		EXPECT_CALL(this->mAlloc0_, allocate(mv1capacity))
+			.Times(AtLeast(1));
+		Elements = this->mv0_.getElements();
+		std::cout << "adress of the second Element = " << Elements << std::endl;
+		/*for (size_t i = 0; i < mv1Size; i++)
+			EXPECT_CALL(this->mAlloc0_, construct(Elements + i, this->mv1_[i]));
+		*/this->mv0_ = this->mv1_;
 		/*
 		EXPECT_CALL(this->mAlloc0_, construct(this->mv0_.getElements()))
 			.Times(v1Size);
