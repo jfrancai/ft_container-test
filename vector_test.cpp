@@ -189,27 +189,18 @@ namespace {
 				// so we can be sure that the allocator destructor is also called.
 				EXPECT_CALL(mAlloc_, Die())
 					.Times(1);
-				EXPECT_CALL(mv0_, Die())
-					.Times(1);
-				EXPECT_CALL(mv1_, Die())
-					.Times(1);
 			}
 
 		typedef ft::vector< Type > Vector;
 		typedef MockAllocator< Type > MockAlloc;
-		typedef MockVector< Type, MockAlloc > MockVector;
 		// Declares the variables the test want to use.
 		Vector v0_;
 		Vector v1_;
 		Vector v2_;
 
 		MockAlloc mAlloc_;
-		MockVector & mv0_;
-		MockVector & mv1_;
 	};
 
-MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc0 = this->mv0_.getAlloc();
-MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc1 = this->mv1_.getAlloc();
 
 #ifdef INT_ONLY
 	typedef testing::Types< int > MyTypes;
