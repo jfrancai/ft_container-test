@@ -76,44 +76,58 @@
 
 namespace {
 
-	// Mocks
-	template< class Type >
-	class MockAllocator : public std::allocator< Type >{
+	using testing::AtLeast;
+
+	// Wrapping the std::allocator API into an interface
+	// Not really an interface here but huh...
+	template < class T >
+	class IAllocator
+	{
 		public:
-			MockAllocator(void) : std::allocator< Type >(){}
+			typedef T				value_type;
+			typedef T*				pointer;
+			typedef const T*		const_pointer;
+			typedef T&				reference;
+			typedef const T&		const_reference;
+			typedef std::size_t		size_type;
+			typedef std::ptrdiff_t	difference_type;
 
-			virtual ~MockAllocator(void)
-			{
-				Die();
-			}
+			// Destructor has to be virtual
+			virtual ~IAllocator() {}
 
-			/*
-			 * Member functions
-			 */
-
-			// Destructors
-			MOCK_METHOD0_T(Die, void(void));
-
-			MOCK_METHOD1_T(destroy, void(Type *));
-			MOCK_METHOD2_T(construct, void(Type*, const Type&));
+			virtual	void	deallocate(pointer p, size_type n){return (this->_alloc.deallocate(p, n));}
+			virtual pointer	allocate(size_type n) {return (this->_alloc.allocate(n));}
+			virtual void	construct( pointer p, const_reference val ){return (this->_alloc.construct(p, val));}
+			virtual void	destroy(pointer p){return (this->_alloc.destroy(p));}
+		private:
+			std::allocator< T >	_alloc;
 	};
 
-	template< class Type, class Allocator=std::allocator< Type > >
-	class MockVector : public ft::vector< Type, Allocator >{
+	// Mocking allocator interface into the MockAllocator class
+	template< class Type >
+	class MockAllocator : public IAllocator< Type >{
 		public:
-			MockVector(void) : ft::vector< Type, Allocator >(){}
-
-			virtual ~MockVector(void)
-			{
-				Die();
-			}
+			/*
+			 * Member Types
+			 */
+			typedef Type			value_type;
+			typedef Type*			pointer;
+			typedef const Type*		const_pointer;
+			typedef Type&			reference;
+			typedef const Type&		const_reference;
+			typedef std::size_t		size_type;
+			typedef std::ptrdiff_t	difference_type;
 
 			/*
 			 * Member functions
 			 */
 
-			// Destructors
-			MOCK_METHOD0_T(Die, void(void));
+			// Mocks
+			MOCK_METHOD1_T(destroy, void(pointer));
+			MOCK_METHOD2_T(construct, void(pointer, const_reference));
+			MOCK_METHOD0_T(construct, void(void));
+			MOCK_METHOD1_T(allocate, pointer(size_type));
+			MOCK_METHOD2_T(deallocate, void(pointer, size_type));
 	};
 
 	//		To create a test:
@@ -132,18 +146,23 @@ namespace {
 	{
 		// Aliases
 		typedef MockAllocator<int> MockAlloc;
-		typedef MockVector<int, MockAlloc> MockVect;
 
 		// Thanks to the mAlloc we are now able to see wich alloc function our vector container is using.
 		// Expectng it to use some alloc function in certain condition.
-		MockVect mIntVector;
-		MockAlloc &mAlloc = mIntVector.getAlloc();
+#ifdef NICE
+		typedef testing::NiceMock< MockAlloc > NiceMockAlloc;
+
+		ft::vector< int, NiceMockAlloc > intVector;
+		NiceMockAlloc &mAlloc = intVector.getAlloc();
+#else
+		ft::vector< int, MockAlloc > intVector;
+		MockAlloc &mAlloc = intVector.getAlloc();
+#endif
 
 		// At this stage we can only check if our object are correctly calling their destructor.
-		EXPECT_CALL(mIntVector, Die());
-		EXPECT_CALL(mAlloc, Die());
+		EXPECT_CALL(mAlloc, deallocate(intVector.getElements(), 2))
+			.Times(1);
 	}
-
 
 	//		To create a fixture:
 	//
@@ -166,6 +185,14 @@ namespace {
 	class VectorTest : public testing::Test
 	{
 		protected:
+			// Default constructor initialize the class's reference
+			VectorTest() : 
+				mAlloc0_(this->mv0_.getAlloc()),
+				mAlloc1_(this->mv1_.getAlloc())
+			{
+				return ;
+			}
+
 			const static int lenv2 = 7;
 			void SetUp()
 			{
@@ -173,7 +200,7 @@ namespace {
 				// 		It is undefined behavior to do such thing, vector size is 0.
 				// 		It's working only because we are dealing with default types.
 				this->v0_[0] = 0;
-				this->v0_[0] = 0;
+				this->v0_[1] = 0;
 
 				v1_.push_back(42);
 				// Same here: undefined behavior in the real world, testing purpose only:
@@ -187,29 +214,31 @@ namespace {
 			{
 				// Die is the function called inside the MockAllocator destructor,
 				// so we can be sure that the allocator destructor is also called.
-				EXPECT_CALL(mAlloc_, Die())
+				EXPECT_CALL(mAlloc0_, deallocate(mv0_.getElements(), v0_.getCapacity()))
 					.Times(1);
-				EXPECT_CALL(mv0_, Die())
-					.Times(1);
-				EXPECT_CALL(mv1_, Die())
+				EXPECT_CALL(mAlloc1_, deallocate(mv1_.getElements(), v1_.getCapacity()))
 					.Times(1);
 			}
 
-		typedef ft::vector< Type > Vector;
-		typedef MockAllocator< Type > MockAlloc;
-		typedef MockVector< Type, MockAlloc > MockVector;
-		// Declares the variables the test want to use.
-		Vector v0_;
-		Vector v1_;
-		Vector v2_;
+#ifdef NICE
+			typedef testing::NiceMock< MockAllocator< Type >  > MockAlloc;
+#else
+			typedef MockAllocator< Type > MockAlloc;
+#endif
+			typedef ft::vector< Type >				Vector;
+			typedef ft::vector< Type, MockAlloc >	mVector;
 
-		MockAlloc mAlloc_;
-		MockVector & mv0_;
-		MockVector & mv1_;
+			// Declares the variables the test want to use.
+			Vector	v0_;
+			Vector	v1_;
+			Vector	v2_;
+
+			mVector	mv0_;
+			mVector	mv1_;
+
+			MockAlloc	&mAlloc0_;
+			MockAlloc	&mAlloc1_;
 	};
-
-MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc0 = this->mv0_.getAlloc();
-MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc1 = this->mv1_.getAlloc();
 
 #ifdef INT_ONLY
 	typedef testing::Types< int > MyTypes;
@@ -254,23 +283,20 @@ MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc1 = this->
 	//test Operator = // vector& operator=( const vector& other );
 	TYPED_TEST(VectorTest, 1TestOperatorEQ)
 	{
-/*
-		EXPECT_CALL(mAlloc, destroy(mVector.getElements()))
-			.Times(1);
-		EXPECT_CALL(mAlloc, construct(mVector.getElements(), "toto is born"))
-			.Times(1);
-		EXPECT_CALL(mAlloc, Die())
-			.Times(1);
-		EXPECT_CALL(mVector, Die())
-			.Times(1);
-*/
-		this->v0_ = this->v2_;
+		//size_t mv0Size = this->mv0_.size();
+		size_t mv1Size = this->mv1_.size();
 
-		size_t k = this->v0_.size();
+		EXPECT_CALL(this->mAlloc0_, allocate(mv1Size))
+			.Times(AtLeast(1));
+		//this->v0_ = this->v2_;
+		/*
+		EXPECT_CALL(this->mAlloc0_, construct(this->mv0_.getElements()))
+			.Times(v1Size);
+
 		ASSERT_EQ(k, this->v2_.size());
-		for (size_t i = 0; i < k; i++)
+		for (size_t i = 0; i < v0Size; i++)
 			EXPECT_EQ(this->v0_[i], this->v2_[i]); 
-		
+		*/
 	}
 
 	TYPED_TEST(VectorTest, TestOperatorElementAccess)
@@ -348,13 +374,14 @@ MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc1 = this->
 	    //this->v5_.push_back(NULL);
 	}
 
+	/*
 	TYPED_TEST(VectorTestString, TestStringAllocation)
 	{
 		typedef MockAllocator<TypeParam> MockAlloc;
 		typedef MockVector<TypeParam, MockAlloc> MockVect;
 
 		MockVect mVector;
-		MockAlloc &mAlloc = mVector.getAlloc();
+		MockAlloc mAlloc = mVector.getAlloc();
 
 		EXPECT_CALL(mAlloc, destroy(mVector.getElements()))
 			.Times(1);
@@ -368,4 +395,5 @@ MockAllocator < Type >::MockAlloc &MockAllocator < TypeParam >::mAlloc1 = this->
 		mVector.push_back("toto is born");
 	}
 	
+	*/
 }  // namespace
