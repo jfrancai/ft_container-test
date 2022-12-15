@@ -323,6 +323,12 @@ namespace {
 	//test Operator = // vector& operator=( const vector& other );
 	TYPED_TEST(VectorTest, 1TestOperatorEQ)
 	{
+		EXPECT_EQ(this->v0_.size(), (size_t)0);
+		EXPECT_EQ(this->v1_.size(), (size_t)1);
+		this->v0_ = this->v1_;
+		EXPECT_EQ(this->v0_.size(), this->v1_.size());
+		for (size_t i = 0; i < this->v0_.size(); i++)
+			EXPECT_EQ(this->v0_[i], this->v1_[i]);
 	}
 
 	TYPED_TEST(VectorTest, TestDefaultConstructor)
@@ -330,7 +336,7 @@ namespace {
 		EXPECT_EQ(this->v0_.size(), (size_t)0);
 
 		EXPECT_EQ(this->v0_[0], 0);
-		EXPECT_EQ(this->v0_[0], 0);
+		EXPECT_EQ(this->v0_[1], 0);
 
 		// Testing to remove elements on an empty vector:
 		this->v0_.pop_back();
