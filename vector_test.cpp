@@ -267,6 +267,8 @@ namespace {
 	//
 	// 5)	If needed, define subroutines for your tests to share.
 	
+
+//////////////////DEFAULT TYPES TESTS////////////////////////////
 	template <typename Type>
 	class VectorTest : public testing::Test
 	{
@@ -299,10 +301,13 @@ namespace {
 			{
 			}
 
-			typedef ft::vector< Type >				Vector;
+			typedef ft::vector< Type >					Vector;
 
-			typedef WrapAllocator< Type >			WrapAlloc;
-			typedef ft::vector< Type, WrapAlloc >	wVector;
+			typedef WrapAllocator< Type >				WrapAlloc;
+			typedef ft::vector< Type, WrapAlloc >		wVector;
+
+			// watcher help you see the calls to the allocator function inside the vector
+			WrapAllocatorWatcher						watcher;
 
 			// Declares the variables the test want to use.
 			Vector	v0_;
@@ -369,6 +374,120 @@ namespace {
 			EXPECT_EQ(this->v2_[i], i + 1);
 	}
 
+	TYPED_TEST(VectorTest, TestGetAllocator)
+	{
+		// 0)
+		std::allocator< TypeParam > alloc = this->v1_.get_allocator();
+		// 1)
+		TypeParam *tab = alloc.allocate(10);
+		for (int i = 0; i < 10; i++)
+			alloc.construct(tab + i, i);
+		for (int i = 0; i < 10; i++)
+			alloc.destroy(tab + i);
+		alloc.deallocate(tab, 10);
+	}
+
+	TYPED_TEST(VectorTest, TestAssign_1_IsExisting)
+	{
+		// 0) Existance
+		this->v1_.assign(5, 'a');
+		// 1) Updating the size
+		EXPECT_EQ(this->v1_.size(), 5);
+		// 2) Updating the value
+		EXPECT_EQ(this->v1_.getCapacity(), 8);
+		// 3) Do not accept garbage
+		EXPECT_THROW({
+			try
+			{
+				this->v1_.assign(-1, 'a');
+			}
+			catch (const std::exception &e)
+			{
+				EXPECT_STREQ("cannot create std::vector larger than max_size()", e.what());
+				throw;
+
+			}
+		}, std::invalid_argument);
+	}
+
+	TYPED_TEST(VectorTest, TestAssign_1_WithCountInfOrEqToCapacity)
+	{
+		// v1_ is of size 1 so we are not suppose to reallocate memory
+		size_t size = 1;
+		this->v1_.assign(size, 'a');
+		for (size_t i = 0; i < size; i++)
+			EXPECT_EQ(this->v1_[i], 'a');
+		EXPECT_EQ(this->v1_.size(), 1);
+		EXPECT_EQ(this->v1_.getCapacity(), 2);
+
+		typedef WrapAllocator< TypeParam >				WrapAlloc;
+		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+		// Enforce not to call any deallocate or allocate in this case (Let's push some more object also).
+		{
+			// Test set up
+			wVector	wVect;
+			WrapAlloc &wAlloc = wVect.getAlloc();
+			wAlloc.setWatcher(&this->watcher);
+
+			wVect.push_back(42);
+			wVect.push_back(21);
+			wVect.push_back(21);
+			wVect.push_back(24);
+			wVect.push_back(48);
+			////////////////////
+
+			// The actual test
+			this->watcher.watch();
+			wVect.assign(3, 'a');
+			this->watcher.stopwatch();
+			// We are not interested on what is happening inside the destructor that why we call watch stop.
+
+			EXPECT_EQ(wVect.size(), 3);
+			EXPECT_EQ(wVect.getCapacity(), 8);
+		}
+		EXPECT_EQ(this->watcher.getTimesAlloc(), 0);
+		EXPECT_EQ(this->watcher.getTimesDealloc(), 0);
+		EXPECT_EQ(this->watcher.getTimesDestr(), 5);
+		EXPECT_EQ(this->watcher.getTimesConstr(), 3);
+	}
+
+	TYPED_TEST(VectorTest, TestAssign_1_WithCountSupToCapacity)
+	{
+		// v1_ is of size 1 so we are not suppose to reallocate memory
+		size_t size = 10;
+		this->v1_.assign(size, 'a');
+		for (size_t i = 0; i < size; i++)
+			EXPECT_EQ(this->v1_[i], 'a');
+
+		typedef WrapAllocator< TypeParam >				WrapAlloc;
+		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+		// Enforce not to call any deallocate or allocate in this case (Let's push some more object also).
+		{
+			// Test set up
+			wVector	wVect;
+			WrapAlloc &wAlloc = wVect.getAlloc();
+			wAlloc.setWatcher(&this->watcher);
+
+			wVect.push_back(42);
+			////////////////////
+
+			// The actual test
+			this->watcher.watch();
+			wVect.assign(100, 'a');
+			this->watcher.stopwatch();
+			// We are not interested on what is happening inside the destructor that why we call watch stop.
+			EXPECT_EQ(wVect.size(), 100);
+			EXPECT_EQ(wVect.getCapacity(), 128);
+		}
+		EXPECT_EQ(this->watcher.getTimesAlloc(), 1);
+		EXPECT_EQ(this->watcher.getTimesDealloc(), 1);
+		EXPECT_EQ(this->watcher.getTimesDestr(), 1);
+		EXPECT_EQ(this->watcher.getTimesConstr(), 100);
+	}
+
+//////////////////OBJECTS TESTS////////////////////////////
 	template<typename Type>
 	class VectorTestString: public testing::Test
 	{
@@ -389,6 +508,12 @@ namespace {
 
 			// Basic Vector object to test
 			typedef ft::vector<Type> Vector;
+
+			typedef WrapAllocator< Type >				WrapAlloc;
+			typedef ft::vector< Type, WrapAlloc >		wVector;
+
+			// watcher help you see the calls to the allocator function inside the vector
+			WrapAllocatorWatcher						watcher;
 
 			Vector v4_;
 			Vector v5_;
@@ -438,20 +563,17 @@ namespace {
 		typedef WrapAllocator<TypeParam> WrapAlloc;
 		typedef ft::vector<TypeParam, WrapAlloc> wVector;
 
-		WrapAllocatorWatcher watcher;
-
 		{
 			wVector	wVect;
 			WrapAlloc &wAlloc = wVect.getAlloc();
-			wAlloc.setWatcher(&watcher);
-			watcher.watch();
+			wAlloc.setWatcher(&this->watcher);
+			this->watcher.watch();
 
 			wVect.push_back("toto is born");
 		}
-		EXPECT_EQ(watcher.getTimesAlloc(), 0);
-		EXPECT_EQ(watcher.getTimesDealloc(), 1);
-		EXPECT_EQ(watcher.getTimesDestr(), 1);
-		EXPECT_EQ(watcher.getTimesConstr(), 1);
-
+		EXPECT_EQ(this->watcher.getTimesAlloc(), 0);
+		EXPECT_EQ(this->watcher.getTimesDealloc(), 1);
+		EXPECT_EQ(this->watcher.getTimesDestr(), 1);
+		EXPECT_EQ(this->watcher.getTimesConstr(), 1);
 	}
 }  // namespace
