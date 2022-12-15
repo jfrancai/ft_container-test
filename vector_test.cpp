@@ -76,36 +76,80 @@
 
 namespace {
 
+	// Mock utils
 	using testing::AtLeast;
+	using testing::_;
 
 	// Wrapping the std::allocator API into an interface
-	// Not really an interface here but huh...
-	template < class T >
+	template < class Type >
 	class IAllocator
 	{
 		public:
-			typedef T				value_type;
-			typedef T*				pointer;
-			typedef const T*		const_pointer;
-			typedef T&				reference;
-			typedef const T&		const_reference;
-			typedef std::size_t		size_type;
-			typedef std::ptrdiff_t	difference_type;
+			typedef Type				value_type;
+			typedef Type*				pointer;
+			typedef const Type*			const_pointer;
+			typedef Type&				reference;
+			typedef const Type&			const_reference;
+			typedef std::size_t			size_type;
+			typedef std::ptrdiff_t		difference_type;
 
 			// Destructor has to be virtual
 			virtual ~IAllocator() {}
 
-			virtual	void	deallocate(pointer p, size_type n){return (this->_alloc.deallocate(p, n));}
-			virtual pointer	allocate(size_type n) {return (this->_alloc.allocate(n));}
-			virtual void	construct( pointer p, const_reference val ){return (this->_alloc.construct(p, val));}
-			virtual void	destroy(pointer p){return (this->_alloc.destroy(p));}
-		private:
-			std::allocator< T >	_alloc;
+			virtual	void	deallocate(pointer p, size_type n) = 0;
+			virtual pointer	allocate(size_type n) = 0;
+			virtual void	construct( pointer p, const_reference val ) = 0;
+			virtual void	destroy(pointer p) = 0;
+	};
+
+	class IWatcher
+	{
+		public:
+			IWatcher() {}
+			virtual	~IWatcher() {}
+
+			virtual void	watch(void) = 0;
+			virtual void	stopwatch(void) = 0;
+	};
+
+	class WrapAllocatorWatcher : public IWatcher {
+
+		public:
+			WrapAllocatorWatcher(void) :
+				_isWatching(false),
+				_timeCalledDealloc(0),
+				_timeCalledAlloc(0),
+				_timeCalledConstr(0),
+				_timeCalledDestr(0)
+			{return;}
+
+			virtual ~WrapAllocatorWatcher() {}
+
+			virtual void	watch(void) {this->_isWatching = true;}
+			virtual void	stopwatch(void) {this->_isWatching = false;}
+
+			int		getTimesDealloc(void) const {return (this->_timeCalledDealloc);}
+			int		getTimesAlloc(void) const {return (this->_timeCalledAlloc);}
+			int		getTimesConstr(void) const {return (this->_timeCalledConstr);}
+			int		getTimesDestr(void) const {return (this->_timeCalledDestr);}
+
+			void	incTimesDealloc(void) {if (this->_isWatching == 0) return; this->_timeCalledDealloc++;}
+			void	incTimesAlloc(void) {if (this->_isWatching == 0) return; this->_timeCalledAlloc++;}
+			void	incTimesConstr(void) {if (this->_isWatching == 0) return; this->_timeCalledConstr++;}
+			void	incTimesDestr(void) {if (this->_isWatching == 0) return; this->_timeCalledDestr++;}
+
+		private: 
+			bool	_isWatching;
+			int		_timeCalledDealloc;
+			int		_timeCalledAlloc;
+			int		_timeCalledConstr;
+			int		_timeCalledDestr;
+
 	};
 
 	// Mocking allocator interface into the MockAllocator class
 	template< class Type >
-	class MockAllocator : public IAllocator< Type >{
+	class WrapAllocator : public IAllocator< Type >{
 		public:
 			/*
 			 * Member Types
@@ -118,16 +162,50 @@ namespace {
 			typedef std::size_t		size_type;
 			typedef std::ptrdiff_t	difference_type;
 
+
+			WrapAllocator(void) : 
+				_alloc(),
+				_watcher(NULL)
+			{
+				return ;
+			}
+
+			virtual ~WrapAllocator(void)
+			{}
+
 			/*
 			 * Member functions
 			 */
+			virtual void	deallocate(pointer p, size_type n) {
+				if (this->_watcher)
+					this->_watcher->incTimesDealloc();
+				return (this->_alloc.deallocate(p, n));
+			}
 
-			// Mocks
-			MOCK_METHOD1_T(destroy, void(pointer));
-			MOCK_METHOD2_T(construct, void(pointer, const_reference));
-			MOCK_METHOD0_T(construct, void(void));
-			MOCK_METHOD1_T(allocate, pointer(size_type));
-			MOCK_METHOD2_T(deallocate, void(pointer, size_type));
+			virtual pointer	allocate(size_type n) {
+				if (this->_watcher)
+					this->_watcher->incTimesAlloc();
+				return (this->_alloc.allocate(n));
+			}
+
+			virtual void	construct( pointer p, const_reference val) {
+				if (this->_watcher)
+					this->_watcher->incTimesConstr();
+				return (this->_alloc.construct(p, val));
+			}
+
+			virtual void	destroy(pointer p)
+			{
+				if (this->_watcher)
+					this->_watcher->incTimesDestr();
+				return (this->_alloc.destroy(p));
+			}
+
+			void	setWatcher(WrapAllocatorWatcher *watcher){this->_watcher = watcher;}
+
+		private:
+			std::allocator< Type >	_alloc;
+			WrapAllocatorWatcher	*_watcher;
 	};
 
 	//		To create a test:
@@ -145,23 +223,31 @@ namespace {
 	TEST(VectorBasicTest, IsExisting)
 	{
 		// Aliases
-		typedef MockAllocator<int> MockAlloc;
+		typedef WrapAllocator<int> WrapAlloc;
 
-		// Thanks to the mAlloc we are now able to see wich alloc function our vector container is using.
-		// Expectng it to use some alloc function in certain condition.
-#ifdef NICE
-		typedef testing::NiceMock< MockAlloc > NiceMockAlloc;
 
-		ft::vector< int, NiceMockAlloc > intVector;
-		NiceMockAlloc &mAlloc = intVector.getAlloc();
-#else
-		ft::vector< int, MockAlloc > intVector;
-		MockAlloc &mAlloc = intVector.getAlloc();
-#endif
+		// First instantiate a watcher
+		WrapAllocatorWatcher watcher;
 
-		// At this stage we can only check if our object are correctly calling their destructor.
-		EXPECT_CALL(mAlloc, deallocate(intVector.getElements(), 2))
-			.Times(1);
+		// Open a new scope so the watcher is at a higher level than the vector.
+		// Now it can see what is happening inside its destructor.
+		{
+			// Construct the tested vector
+			ft::vector< int, WrapAlloc > intVector;
+
+			// Then get the constructed allocator inside the tested vector
+			WrapAlloc &wAlloc = intVector.getAlloc();
+
+			// Put the watcher inside the vector
+			wAlloc.setWatcher(&watcher);
+
+			// Start watching
+			watcher.watch();
+		}
+		EXPECT_EQ(watcher.getTimesAlloc(), 0);
+		EXPECT_EQ(watcher.getTimesDealloc(), 1);
+		EXPECT_EQ(watcher.getTimesConstr(), 0);
+		EXPECT_EQ(watcher.getTimesDestr(), 0);
 	}
 
 	//		To create a fixture:
@@ -186,9 +272,8 @@ namespace {
 	{
 		protected:
 			// Default constructor initialize the class's reference
-			VectorTest() : 
-				mAlloc0_(this->mv0_.getAlloc()),
-				mAlloc1_(this->mv1_.getAlloc())
+			VectorTest() :
+				wAlloc0_(this->wV0_.getAlloc())
 			{
 				return ;
 			}
@@ -212,32 +297,20 @@ namespace {
 
 			void TearDown()
 			{
-				// Die is the function called inside the MockAllocator destructor,
-				// so we can be sure that the allocator destructor is also called.
-				EXPECT_CALL(mAlloc0_, deallocate(mv0_.getElements(), mv0_.getCapacity()))
-					.Times(1);
-				EXPECT_CALL(mAlloc1_, deallocate(mv1_.getElements(), mv1_.getCapacity()))
-					.Times(1);
 			}
 
-#ifdef NICE
-			typedef testing::NiceMock< MockAllocator< Type >  > MockAlloc;
-#else
-			typedef MockAllocator< Type > MockAlloc;
-#endif
 			typedef ft::vector< Type >				Vector;
-			typedef ft::vector< Type, MockAlloc >	mVector;
+
+			typedef WrapAllocator< Type >			WrapAlloc;
+			typedef ft::vector< Type, WrapAlloc >	wVector;
 
 			// Declares the variables the test want to use.
 			Vector	v0_;
 			Vector	v1_;
 			Vector	v2_;
 
-			mVector	mv0_;
-			mVector	mv1_;
-
-			MockAlloc	&mAlloc0_;
-			MockAlloc	&mAlloc1_;
+			wVector		wV0_;
+			WrapAlloc	&wAlloc0_;
 	};
 
 #ifdef INT_ONLY
@@ -246,6 +319,11 @@ namespace {
 	typedef testing::Types< int, float, double, char, wchar_t> MyTypes;
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
+
+	//test Operator = // vector& operator=( const vector& other );
+	TYPED_TEST(VectorTest, 1TestOperatorEQ)
+	{
+	}
 
 	TYPED_TEST(VectorTest, TestDefaultConstructor)
 	{
@@ -280,47 +358,6 @@ namespace {
 		EXPECT_EQ(this->v2_.size(), (size_t)6);
 	}
 	
-	//test Operator = // vector& operator=( const vector& other );
-	TYPED_TEST(VectorTest, 1TestOperatorEQ)
-	{
-		this->mv1_.push_back(2);
-		this->mv1_.push_back(222);
-		this->mv1_.push_back(420);
-		this->mv0_.push_back(12);
-		this->mv0_.push_back(22);
-		this->mv0_.push_back(32);
-		this->mv0_.push_back(42);
-		this->mv0_.push_back(4);
-
-		size_t mv0Size = this->mv0_.size();
-		//size_t mv1Size = this->mv1_.size();
-		size_t mv1capacity = this->mv1_.getCapacity();
-		size_t mv0capacity = this->mv0_.getCapacity();
-
-		TypeParam * Elements = this->mv0_.getElements();
-		std::cout << "adress of the first Element = " << Elements << std::endl;
-		for (size_t i = 0; i < mv0Size; i++)
-			EXPECT_CALL(this->mAlloc0_, destroy(Elements + i))
-				.Times(1);
-		EXPECT_CALL(this->mAlloc0_, deallocate(Elements, mv0capacity))
-			.Times(AtLeast(1));
-		EXPECT_CALL(this->mAlloc0_, allocate(mv1capacity))
-			.Times(AtLeast(1));
-		Elements = this->mv0_.getElements();
-		std::cout << "adress of the second Element = " << Elements << std::endl;
-		/*for (size_t i = 0; i < mv1Size; i++)
-			EXPECT_CALL(this->mAlloc0_, construct(Elements + i, this->mv1_[i]));
-		*/this->mv0_ = this->mv1_;
-		/*
-		EXPECT_CALL(this->mAlloc0_, construct(this->mv0_.getElements()))
-			.Times(v1Size);
-
-		ASSERT_EQ(k, this->v2_.size());
-		for (size_t i = 0; i < v0Size; i++)
-			EXPECT_EQ(this->v0_[i], this->v2_[i]); 
-		*/
-	}
-
 	TYPED_TEST(VectorTest, TestOperatorElementAccess)
 	{
 		//v1
@@ -396,26 +433,25 @@ namespace {
 	    //this->v5_.push_back(NULL);
 	}
 
-	/*
 	TYPED_TEST(VectorTestString, TestStringAllocation)
 	{
-		typedef MockAllocator<TypeParam> MockAlloc;
-		typedef MockVector<TypeParam, MockAlloc> MockVect;
+		typedef WrapAllocator<TypeParam> WrapAlloc;
+		typedef ft::vector<TypeParam, WrapAlloc> wVector;
 
-		MockVect mVector;
-		MockAlloc mAlloc = mVector.getAlloc();
+		WrapAllocatorWatcher watcher;
 
-		EXPECT_CALL(mAlloc, destroy(mVector.getElements()))
-			.Times(1);
-		EXPECT_CALL(mAlloc, construct(mVector.getElements(), "toto is born"))
-			.Times(1);
-		EXPECT_CALL(mAlloc, Die())
-			.Times(1);
-		EXPECT_CALL(mVector, Die())
-			.Times(1);
+		{
+			wVector	wVect;
+			WrapAlloc &wAlloc = wVect.getAlloc();
+			wAlloc.setWatcher(&watcher);
+			watcher.watch();
 
-		mVector.push_back("toto is born");
+			wVect.push_back("toto is born");
+		}
+		EXPECT_EQ(watcher.getTimesAlloc(), 0);
+		EXPECT_EQ(watcher.getTimesDealloc(), 1);
+		EXPECT_EQ(watcher.getTimesDestr(), 1);
+		EXPECT_EQ(watcher.getTimesConstr(), 1);
+
 	}
-	
-	*/
 }  // namespace
