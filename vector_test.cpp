@@ -369,6 +369,32 @@ namespace {
 			EXPECT_EQ(this->v2_[i], i + 1);
 	}
 
+	TYPED_TEST(VectorTest, TestFront)
+	{
+		//v0
+		EXPECT_EQ(this->v0_.front(), 0);
+		this->v0_.push_back(55);
+		EXPECT_EQ(this->v0_.front(), 55);
+
+		//v1
+		EXPECT_EQ(this->v1_.front(), 42);
+		this->v1_.push_back(32);
+		EXPECT_EQ(this->v1_.front(), 42);
+
+		//v2
+		EXPECT_EQ(this->v2_.front(), 1);
+		// overload
+		this->v2_.pop_back();
+		this->v2_.pop_back();
+		this->v2_.pop_back();
+		this->v2_.pop_back();
+		this->v2_.pop_back();
+		this->v2_.pop_back();
+		this->v2_.pop_back();
+		//std::cout << "\033[1;33m~🌈 FINAL 🌻$\033[0m v2_[0] = " << this->v2_[0] << std::endl;
+		EXPECT_EQ(this->v2_.front(), 1);
+	}
+
 	template<typename Type>
 	class VectorTestString: public testing::Test
 	{
