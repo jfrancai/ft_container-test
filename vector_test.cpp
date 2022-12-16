@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector_test.cpp                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jfrancai <jfrancai@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/16 15:19:38 by jfrancai          #+#    #+#             */
+/*   Updated: 2022/12/16 17:53:52 by jfrancai         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 /*
  * Usefull links :
  * Reference Testing	: https://google.github.io/googletest/reference/testing.html
@@ -317,6 +329,25 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, TestBack)
+	{
+		EXPECT_EQ(this->v2_.back(), (size_t)7);
+		this->v2_.pop_back();
+		this->v2_.pop_back();
+		EXPECT_EQ(this->v2_.back(), (size_t)5);
+	}
+
+	TYPED_TEST(VectorTest, TestData)
+	{
+		TypeParam	*dataV0 = this->v0_.data();
+		EXPECT_EQ(dataV0, (TypeParam *)NULL);
+
+		TypeParam	*dataV1 = this->v1_.data();
+		EXPECT_EQ(dataV1, &this->v1_[0]);
+		this->v1_.pop_back();
+		EXPECT_EQ(dataV1, &this->v1_[0]);
+	}
+
 	TYPED_TEST(VectorTest, TestAt)
 	{
 		EXPECT_EQ(this->v1_.at(0), 42);
@@ -597,6 +628,9 @@ namespace {
 		// Calling front on empty vector is undefined.
 		// Those tests takes some time so we regroup them in the same test.
 		
+		// Some const vector definition
+		const ft::vector< TypeParam > myConstVect;
+
 		// Calling front
 		EXPECT_EXIT({
 				TypeParam front = this->v0_.front();
@@ -604,11 +638,40 @@ namespace {
 			}, testing::KilledBySignal(SIGSEGV), ".*");
 
 		// Calling const front
-		const ft::vector< TypeParam > myConstVect;
 		EXPECT_EXIT({
 				const TypeParam ref = myConstVect.front();
 				(void)ref;
 			}, testing::KilledBySignal(SIGSEGV), ".*");
+
+		// Calling data
+		EXPECT_EXIT({
+				TypeParam *ptr = this->v0_.data();
+				TypeParam value = *ptr;
+				(void)value;
+			}, testing::KilledBySignal(SIGSEGV), ".*");
+
+		// Calling const data
+		EXPECT_EXIT({
+				const TypeParam *const_ptr = myConstVect.data();
+				TypeParam value = *const_ptr;
+				(void)value;
+			}, testing::KilledBySignal(SIGSEGV), ".*");
+
+		// Calling back
+		EXPECT_EXIT({
+				TypeParam &reflast = this->v0_.back();
+				TypeParam value = reflast;
+				(void)value;
+			}, testing::KilledBySignal(SIGSEGV), ".*");
+
+
+		// Calling const back
+		EXPECT_EXIT({
+				const TypeParam &const_ref = myConstVect.back();
+				TypeParam value = const_ref;
+				(void)value;
+			}, testing::KilledBySignal(SIGSEGV), ".*");
+
 
 		// Calling at
 		EXPECT_THROW({
