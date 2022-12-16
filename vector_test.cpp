@@ -317,12 +317,12 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
-	/*
 	TYPED_TEST(VectorTest, TestAt)
 	{
-		EXPECT_EQ(this->v1_.at(1), 42);
+		EXPECT_EQ(this->v1_.at(0), 42);
+		for (TypeParam i = 0; i < this->lenv2; i++)
+			EXPECT_EQ(this->v2_.at(i), i + 1);
 	}
-	*/
 
 	TYPED_TEST(VectorTest, TestCapacity)
 	{
@@ -592,17 +592,21 @@ namespace {
 
 //////////////////OBJECTS TESTS////////////////////////////
 
-	TYPED_TEST(VectorTest, DISABLED_TestFrontSEGV)
+	TYPED_TEST(VectorTest, DISABLED_TestSIGNAL)
 	{
 		// Calling front on empty vector is undefined.
 		// Those tests takes some time so we regroup them in the same test.
 		
 		// Calling front
-		EXPECT_EXIT({const TypeParam front = this->v0_.front();(void)front;}, testing::KilledBySignal(SIGSEGV), ".*");
+		EXPECT_EXIT({TypeParam front = this->v0_.front();(void)front;}, testing::KilledBySignal(SIGSEGV), ".*");
 
 		// Calling const_front
 		const ft::vector< TypeParam > myConstVect;
 		EXPECT_EXIT({const TypeParam ref = myConstVect.front();(void)ref;}, testing::KilledBySignal(SIGSEGV), ".*");
+
+		EXPECT_THROW({this->v0_.at(0);}, std::out_of_range);
+
+		EXPECT_THROW({myConstVect.at(0);}, std::out_of_range);
 	}
 
 	TYPED_TEST(VectorTest, TestFront)
