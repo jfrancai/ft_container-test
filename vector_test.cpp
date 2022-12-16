@@ -598,15 +598,45 @@ namespace {
 		// Those tests takes some time so we regroup them in the same test.
 		
 		// Calling front
-		EXPECT_EXIT({TypeParam front = this->v0_.front();(void)front;}, testing::KilledBySignal(SIGSEGV), ".*");
+		EXPECT_EXIT({
+				TypeParam front = this->v0_.front();
+				(void)front;
+			}, testing::KilledBySignal(SIGSEGV), ".*");
 
-		// Calling const_front
+		// Calling const front
 		const ft::vector< TypeParam > myConstVect;
-		EXPECT_EXIT({const TypeParam ref = myConstVect.front();(void)ref;}, testing::KilledBySignal(SIGSEGV), ".*");
+		EXPECT_EXIT({
+				const TypeParam ref = myConstVect.front();
+				(void)ref;
+			}, testing::KilledBySignal(SIGSEGV), ".*");
 
-		EXPECT_THROW({this->v0_.at(0);}, std::out_of_range);
+		// Calling at
+		EXPECT_THROW({
+			try
+			{
+				this->v0_.at(0);
+			}
+			catch (const std::exception &e)
+			{
+				EXPECT_STREQ("vector::_M_range_check: __n (which is 0) >= this->size() (which is 0)", e.what());
+				throw;
 
-		EXPECT_THROW({myConstVect.at(0);}, std::out_of_range);
+			}
+			}, std::out_of_range);
+
+		// Calling const at
+		EXPECT_THROW({
+			try
+			{
+				myConstVect.at(0);
+			}
+			catch (const std::exception &e)
+			{
+				EXPECT_STREQ("vector::_M_range_check: __n (which is 0) >= this->size() (which is 0)", e.what());
+				throw;
+
+			}
+			}, std::out_of_range);
 	}
 
 	TYPED_TEST(VectorTest, TestFront)
