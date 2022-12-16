@@ -325,15 +325,105 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
-	//test Operator = // vector& operator=( const vector& other );
+	TYPED_TEST(VectorTest, 2TestOperatorEQ)
+	{
+		typedef WrapAllocator< TypeParam >				WrapAlloc;
+		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+		{
+			wVector	wV0;
+			WrapAlloc &wAlloc0 = wV0.getAlloc();
+			wAlloc0.setWatcher(&this->watcher);
+
+			wVector	wV1;
+			WrapAlloc &wAlloc1 = wV1.getAlloc();
+			wAlloc1.setWatcher(&this->watcher);
+
+			// Test setup
+			for (int i = 0; i < 42; i++)
+				wV1.push_back(42 + i);
+			EXPECT_EQ(wV0.size(), (size_t)0);
+			EXPECT_EQ(wV1.size(), (size_t)42);
+
+			this->watcher.watch();
+			wV1 = wV0;
+			this->watcher.stopwatch();
+
+			EXPECT_EQ(wV0.size(), wV1.size());
+			EXPECT_EQ(wV0.capacity(), wV1.capacity());
+			for (size_t i = 0; i < wV0.size(); i++)
+				EXPECT_EQ(wV0[i], wV1[i]);
+		}
+		EXPECT_EQ(this->watcher.getTimesAlloc(), 1);
+		EXPECT_EQ(this->watcher.getTimesDealloc(), 1);
+		EXPECT_EQ(this->watcher.getTimesDestr(), 42);
+		EXPECT_EQ(this->watcher.getTimesConstr(), 0);
+	}
+
 	TYPED_TEST(VectorTest, 1TestOperatorEQ)
 	{
-		EXPECT_EQ(this->v0_.size(), (size_t)0);
-		EXPECT_EQ(this->v1_.size(), (size_t)1);
-		this->v0_ = this->v1_;
-		EXPECT_EQ(this->v0_.size(), this->v1_.size());
-		for (size_t i = 0; i < this->v0_.size(); i++)
-			EXPECT_EQ(this->v0_[i], this->v1_[i]);
+		typedef WrapAllocator< TypeParam >				WrapAlloc;
+		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+		{
+			wVector	wV0;
+			WrapAlloc &wAlloc0 = wV0.getAlloc();
+			wAlloc0.setWatcher(&this->watcher);
+
+			wVector	wV1;
+			WrapAlloc &wAlloc1 = wV1.getAlloc();
+			wAlloc1.setWatcher(&this->watcher);
+
+			// Test setup
+			for (int i = 0; i < 42; i++)
+				wV1.push_back(42 + i);
+			EXPECT_EQ(wV0.size(), (size_t)0);
+			EXPECT_EQ(wV1.size(), (size_t)42);
+
+			this->watcher.watch();
+			wV0 = wV1;
+			this->watcher.stopwatch();
+
+			EXPECT_EQ(wV0.size(), wV1.size());
+			EXPECT_EQ(wV0.capacity(), wV1.capacity());
+			for (size_t i = 0; i < wV0.size(); i++)
+				EXPECT_EQ(wV0[i], wV1[i]);
+		}
+		EXPECT_EQ(this->watcher.getTimesAlloc(), 1);
+		EXPECT_EQ(this->watcher.getTimesDealloc(), 1);
+		EXPECT_EQ(this->watcher.getTimesDestr(), 0);
+		EXPECT_EQ(this->watcher.getTimesConstr(), 42);
+	}
+
+	TYPED_TEST(VectorTest, 0TestOperatorEQ)
+	{
+		typedef WrapAllocator< TypeParam >				WrapAlloc;
+		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+		{
+			wVector	wV0;
+			WrapAlloc &wAlloc0 = wV0.getAlloc();
+			wAlloc0.setWatcher(&this->watcher);
+
+			wVector	wV1;
+			WrapAlloc &wAlloc1 = wV1.getAlloc();
+			wAlloc1.setWatcher(&this->watcher);
+
+			// Test setup
+			EXPECT_EQ(wV0.size(), (size_t)0);
+			EXPECT_EQ(wV1.size(), (size_t)0);
+
+			this->watcher.watch();
+			wV0 = wV1;
+			this->watcher.stopwatch();
+
+			EXPECT_EQ(wV0.size(), wV1.size());
+			EXPECT_EQ(wV0.capacity(), wV1.capacity());
+		}
+		EXPECT_EQ(this->watcher.getTimesAlloc(), 0);
+		EXPECT_EQ(this->watcher.getTimesDealloc(), 0);
+		EXPECT_EQ(this->watcher.getTimesDestr(), 0);
+		EXPECT_EQ(this->watcher.getTimesConstr(), 0);
 	}
 
 	TYPED_TEST(VectorTest, TestDefaultConstructor)
@@ -400,7 +490,7 @@ namespace {
 		// 1) Updating the size
 		EXPECT_EQ(this->v1_.size(), 5);
 		// 2) Updating the value
-		EXPECT_EQ(this->v1_.getCapacity(), 8);
+		EXPECT_EQ(this->v1_.capacity(), 8);
 		// 3) Do not accept garbage
 		EXPECT_THROW({
 			try
@@ -424,7 +514,7 @@ namespace {
 		for (size_t i = 0; i < size; i++)
 			EXPECT_EQ(this->v1_[i], 'a');
 		EXPECT_EQ(this->v1_.size(), 1);
-		EXPECT_EQ(this->v1_.getCapacity(), 2);
+		EXPECT_EQ(this->v1_.capacity(), 2);
 
 		typedef WrapAllocator< TypeParam >				WrapAlloc;
 		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
@@ -450,7 +540,7 @@ namespace {
 			// We are not interested on what is happening inside the destructor that why we call watch stop.
 
 			EXPECT_EQ(wVect.size(), 3);
-			EXPECT_EQ(wVect.getCapacity(), 8);
+			EXPECT_EQ(wVect.capacity(), 8);
 		}
 		EXPECT_EQ(this->watcher.getTimesAlloc(), 0);
 		EXPECT_EQ(this->watcher.getTimesDealloc(), 0);
@@ -485,7 +575,7 @@ namespace {
 			this->watcher.stopwatch();
 			// We are not interested on what is happening inside the destructor that why we call watch stop.
 			EXPECT_EQ(wVect.size(), 100);
-			EXPECT_EQ(wVect.getCapacity(), 128);
+			EXPECT_EQ(wVect.capacity(), 128);
 		}
 		EXPECT_EQ(this->watcher.getTimesAlloc(), 1);
 		EXPECT_EQ(this->watcher.getTimesDealloc(), 1);
