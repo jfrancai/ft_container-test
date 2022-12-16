@@ -283,15 +283,7 @@ namespace {
 			const static int lenv2 = 7;
 			void SetUp()
 			{
-				// We don't expect the data to be initialized at the start, so we do:
-				// 		It is undefined behavior to do such thing, vector size is 0.
-				// 		It's working only because we are dealing with default types.
-				this->v0_[0] = 0;
-				this->v0_[1] = 0;
-
 				v1_.push_back(42);
-				// Same here: undefined behavior in the real world, testing purpose only:
-				v1_[1] = 0;
 
 				for (Type i = 1; i <= lenv2; i++)
 					v2_.push_back(i);
@@ -324,6 +316,13 @@ namespace {
 	typedef testing::Types< int, float, double, char, wchar_t> MyTypes;
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
+
+	/*
+	TYPED_TEST(VectorTest, TestAt)
+	{
+		EXPECT_EQ(this->v1_.at(1), 42);
+	}
+	*/
 
 	TYPED_TEST(VectorTest, TestCapacity)
 	{
@@ -439,9 +438,7 @@ namespace {
 	TYPED_TEST(VectorTest, TestDefaultConstructor)
 	{
 		EXPECT_EQ(this->v0_.size(), (size_t)0);
-
-		EXPECT_EQ(this->v0_[0], 0);
-		EXPECT_EQ(this->v0_[1], 0);
+		EXPECT_EQ(this->v0_.capacity(), (size_t)0);
 
 		// Testing to remove elements on an empty vector:
 		this->v0_.pop_back();
@@ -449,6 +446,7 @@ namespace {
 		this->v0_.pop_back();
 
 		EXPECT_EQ(this->v0_.size(), (size_t)0);
+		EXPECT_EQ(this->v0_.capacity(), (size_t)0);
 	}
 
 	TYPED_TEST(VectorTest, TestCapacitySize)
@@ -473,7 +471,6 @@ namespace {
 	{
 		//v1
 		EXPECT_EQ(this->v1_[0], 42);
-		EXPECT_EQ(this->v1_[1], 0);
 
 		//v2
 		for (int i = 0; i < this->lenv2; i++)
@@ -595,16 +592,22 @@ namespace {
 
 //////////////////OBJECTS TESTS////////////////////////////
 
-	TYPED_TEST(VectorTest, TestConstFront)
+	TYPED_TEST(VectorTest, DISABLED_TestFrontSEGV)
 	{
-		const ft::vector<TypeParam> myConstVect;
-		myConstVect.front();
+		// Calling front on empty vector is undefined.
+		// Those tests takes some time so we regroup them in the same test.
+		
+		// Calling front
+		EXPECT_EXIT({const TypeParam front = this->v0_.front();(void)front;}, testing::KilledBySignal(SIGSEGV), ".*");
+
+		// Calling const_front
+		const ft::vector< TypeParam > myConstVect;
+		EXPECT_EXIT({const TypeParam ref = myConstVect.front();(void)ref;}, testing::KilledBySignal(SIGSEGV), ".*");
 	}
 
 	TYPED_TEST(VectorTest, TestFront)
 	{
 		//v0
-		EXPECT_EQ(this->v0_.front(), 0); // Undefined behavior
 		this->v0_.push_back(55);
 		EXPECT_EQ(this->v0_.front(), 55);
 
@@ -706,12 +709,12 @@ namespace {
 			wVector	wVect;
 			WrapAlloc &wAlloc = wVect.getAlloc();
 			wAlloc.setWatcher(&this->watcher);
-			this->watcher.watch();
 
+			this->watcher.watch();
 			wVect.push_back("toto is born");
 		}
-		EXPECT_EQ(this->watcher.getTimesAlloc(), 0);
-		EXPECT_EQ(this->watcher.getTimesDealloc(), 1);
+		EXPECT_EQ(this->watcher.getTimesAlloc(), 1);
+		EXPECT_GE(this->watcher.getTimesDealloc(), 1);
 		EXPECT_EQ(this->watcher.getTimesDestr(), 1);
 		EXPECT_EQ(this->watcher.getTimesConstr(), 1);
 	}
