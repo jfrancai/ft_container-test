@@ -488,10 +488,17 @@ namespace {
 	}
 
 //////////////////OBJECTS TESTS////////////////////////////
+
+	TYPED_TEST(VectorTest, TestConstFront)
+	{
+		const ft::vector<TypeParam> myConstVect;
+		myConstVect.front();
+	}
+
 	TYPED_TEST(VectorTest, TestFront)
 	{
 		//v0
-		EXPECT_EQ(this->v0_.front(), 0);
+		EXPECT_EQ(this->v0_.front(), 0); // Undefined behavior
 		this->v0_.push_back(55);
 		EXPECT_EQ(this->v0_.front(), 55);
 
