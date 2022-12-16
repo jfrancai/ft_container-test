@@ -325,6 +325,16 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, TestCapacity)
+	{
+		EXPECT_EQ(this->v0_.capacity(), 0);
+		for (int i = 0; i < 8; i++)
+			this->v0_.push_back(42);
+		for (int i = 0; i < 10; i++)
+			this->v0_.pop_back();
+		EXPECT_EQ(this->v0_.capacity(), 8);
+	}
+
 	TYPED_TEST(VectorTest, 2TestOperatorEQ)
 	{
 		typedef WrapAllocator< TypeParam >				WrapAlloc;
@@ -514,7 +524,7 @@ namespace {
 		for (size_t i = 0; i < size; i++)
 			EXPECT_EQ(this->v1_[i], 'a');
 		EXPECT_EQ(this->v1_.size(), 1);
-		EXPECT_EQ(this->v1_.capacity(), 2);
+		EXPECT_EQ(this->v1_.capacity(), 1);
 
 		typedef WrapAllocator< TypeParam >				WrapAlloc;
 		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
@@ -623,7 +633,7 @@ namespace {
 		protected:
 			void SetUp()
 			{
-				// Default capacity is 2
+				// Default capacity is 1
 				this->v5_.push_back("First sentence.");
 				this->v5_.push_back("An other sentence.");
 				// Now it should resize the capacity to 4
