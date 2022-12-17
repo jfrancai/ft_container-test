@@ -6,7 +6,7 @@
 /*   By: jfrancai <jfrancai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 15:19:38 by jfrancai          #+#    #+#             */
-/*   Updated: 2022/12/17 17:23:40 by jfrancai         ###   ########.fr       */
+/*   Updated: 2022/12/19 12:20:31 by jfrancai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -344,6 +344,7 @@ namespace {
 	{
 		size_t max_elements = 32;
 		this->v0_.reserve(max_elements);
+
 	}
 
 	TYPED_TEST(VectorTest, TestMaxSize)
@@ -352,6 +353,23 @@ namespace {
 		EXPECT_EQ(this->v0_.max_size(), this->witnessEmptyVect.max_size());
 		EXPECT_EQ(this->v1_.max_size(), this->witnessEmptyVect.max_size());
 		EXPECT_EQ(this->v2_.max_size(), this->witnessEmptyVect.max_size());
+
+		{
+			typedef WrapAllocator< TypeParam >				WrapAlloc;
+			typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+			// Test set up
+			wVector	wVect;
+			WrapAlloc &wAlloc = wVect.getAlloc();
+			wAlloc.setWatcher(&this->watcher);
+
+			// Watch
+			this->watcher.watch();
+			wVect.max_size();
+			this->watcher.stopwatch();
+			// endWatch
+		}
+		EXPECT_EQ(this->watcher.getTimesMaxSize(), 1);
 	}
 
 	TYPED_TEST(VectorTest, TestEmpty)
