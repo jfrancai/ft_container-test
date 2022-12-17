@@ -6,7 +6,7 @@
 /*   By: jfrancai <jfrancai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 15:19:38 by jfrancai          #+#    #+#             */
-/*   Updated: 2022/12/17 15:45:53 by jfrancai         ###   ########.fr       */
+/*   Updated: 2022/12/17 17:23:40 by jfrancai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -557,6 +557,33 @@ namespace {
 		for (int i = 0; i < 10; i++)
 			alloc.destroy(tab + i);
 		alloc.deallocate(tab, 10);
+	}
+
+	TYPED_TEST(VectorTest, TestAssign_1_OnEmptyVect)
+	{
+		{
+			typedef WrapAllocator< TypeParam >				WrapAlloc;
+			typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+			// Test set up
+			wVector	wVect;
+			WrapAlloc &wAlloc = wVect.getAlloc();
+			wAlloc.setWatcher(&this->watcher);
+
+			// Watch
+			this->watcher.watch();
+			wVect.assign(1, 42);
+			this->watcher.stopwatch();
+			// endWatch
+
+			EXPECT_EQ(wVect.size(), size_t(1));
+			EXPECT_EQ(wVect.capacity(), size_t(1));
+		}
+		EXPECT_EQ(this->watcher.getTimesAlloc(), 1);
+		EXPECT_LE(this->watcher.getTimesDealloc(), 1); // EXPECT_LE because deallocation with size of 0 may be expected
+		EXPECT_EQ(this->watcher.getTimesDestr(), 0);
+		EXPECT_EQ(this->watcher.getTimesConstr(), 1);
+		EXPECT_EQ(this->watcher.getTimesMaxSize(), 1);
 	}
 
 	TYPED_TEST(VectorTest, TestAssign_1_IsExisting)
