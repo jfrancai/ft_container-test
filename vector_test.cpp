@@ -6,7 +6,7 @@
 /*   By: jfrancai <jfrancai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 15:19:38 by jfrancai          #+#    #+#             */
-/*   Updated: 2022/12/16 17:53:52 by jfrancai         ###   ########.fr       */
+/*   Updated: 2022/12/17 12:46:05 by jfrancai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -361,6 +361,11 @@ namespace {
 		for (int i = 0; i < 10; i++)
 			this->v0_.pop_back();
 		EXPECT_EQ(this->v0_.capacity(), (size_t)8);
+	}
+
+	TYPED_TEST(VectorTest, 3TestOperatorEQ)
+	{
+		this->v0_ = this->v0_; // Make to not modify anything if you are calling operator= on itself with (this == &rhs)
 	}
 
 	TYPED_TEST(VectorTest, 2TestOperatorEQ)
