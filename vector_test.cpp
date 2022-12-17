@@ -6,7 +6,7 @@
 /*   By: jfrancai <jfrancai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 15:19:38 by jfrancai          #+#    #+#             */
-/*   Updated: 2022/12/17 17:23:40 by jfrancai         ###   ########.fr       */
+/*   Updated: 2022/12/19 14:04:11 by jfrancai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -340,18 +340,73 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
-	TYPED_TEST(VectorTest, TestReserve)
+	TYPED_TEST(VectorTest, TestReserve_IsExisting)
 	{
 		size_t max_elements = 32;
 		this->v0_.reserve(max_elements);
 	}
 
+	TYPED_TEST(VectorTest, TestReserve_CapacityUpdates)
+	{
+		this->v0_.reserve(0);
+		EXPECT_EQ(this->v0_.capacity(), size_t(0));
+
+		this->v0_.reserve(32);
+		EXPECT_EQ(this->v0_.capacity(), size_t(32));
+
+		this->v0_.reserve(44);
+		EXPECT_EQ(this->v0_.capacity(), size_t(64));
+
+		this->v0_.reserve(0);
+		EXPECT_EQ(this->v0_.capacity(), size_t(64));
+	}
+
+	TYPED_TEST(VectorTest, TestReserve_Allocation)
+	{
+		{
+			typedef WrapAllocator< TypeParam >				WrapAlloc;
+			typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+			// Test set up
+			wVector	wVect;
+			WrapAlloc &wAlloc = wVect.getAlloc();
+			wAlloc.setWatcher(&this->watcher);
+
+			// Watch
+			this->watcher.watch();
+			wVect.reserve(0);
+			this->watcher.stopwatch();
+			// endWatch
+			EXPECT_EQ(this->watcher.getTimesAlloc(), 0);
+			EXPECT_EQ(this->watcher.getTimesDealloc(), 0);
+			EXPECT_EQ(this->watcher.getTimesDestr(), 0);
+			EXPECT_EQ(this->watcher.getTimesConstr(), 0);
+		}
+	}
+
+
 	TYPED_TEST(VectorTest, TestMaxSize)
 	{
 		this->v0_.max_size();
-		EXPECT_EQ(this->v0_.max_size(), this->witnessEmptyVect.max_size());
-		EXPECT_EQ(this->v1_.max_size(), this->witnessEmptyVect.max_size());
-		EXPECT_EQ(this->v2_.max_size(), this->witnessEmptyVect.max_size());
+		EXPECT_EQ(this->v0_.max_size(), size_t(this->witnessEmptyVect.max_size()));
+		EXPECT_EQ(this->v1_.max_size(), size_t(this->witnessEmptyVect.max_size()));
+
+		{
+			typedef WrapAllocator< TypeParam >				WrapAlloc;
+			typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+			// Test set up
+			wVector	wVect;
+			WrapAlloc &wAlloc = wVect.getAlloc();
+			wAlloc.setWatcher(&this->watcher);
+
+			// Watch
+			this->watcher.watch();
+			wVect.max_size();
+			this->watcher.stopwatch();
+			// endWatch
+		}
+		EXPECT_EQ(this->watcher.getTimesMaxSize(), 1);
 	}
 
 	TYPED_TEST(VectorTest, TestEmpty)
@@ -763,6 +818,25 @@ namespace {
 				throw;
 			}
 			}, std::out_of_range);
+		
+		{
+			// Some const vector definition
+			ft::vector< TypeParam > myLocalVect;
+
+			// Calling reserve with new_cap > max_size
+			EXPECT_THROW({
+
+				try
+				{
+					myLocalVect.reserve(-1);
+				}
+				catch (const std::exception &e)
+				{
+					EXPECT_STREQ("vector::reserve", e.what());
+					throw;
+				}
+				}, std::length_error);
+		}
 	}
 
 	TYPED_TEST(VectorTest, TestFront)
