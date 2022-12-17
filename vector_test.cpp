@@ -6,7 +6,7 @@
 /*   By: jfrancai <jfrancai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 15:19:38 by jfrancai          #+#    #+#             */
-/*   Updated: 2022/12/17 12:46:05 by jfrancai         ###   ########.fr       */
+/*   Updated: 2022/12/17 15:45:53 by jfrancai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
  * Usefull links :
  * Reference Testing	: https://google.github.io/googletest/reference/testing.html
  * Reference Assertions : https://google.github.io/googletest/reference/assertions.html
+ *
+ * [ google test v1.8.1 in use for compatibility reasons ]
  */
 
 /*	
@@ -82,15 +84,11 @@
 // Testing Library
 #include <gtest/gtest.h>
 // Mocking Library
-#include "gmock/gmock.h"
+//#include "gmock/gmock.h"
 // The tested Library
 #include <ft/vector.hpp>
 
 namespace {
-
-	// Mock utils
-	using testing::AtLeast;
-	using testing::_;
 
 	// Wrapping the std::allocator API into an interface
 	template < class Type >
@@ -108,10 +106,11 @@ namespace {
 			// Destructor has to be virtual
 			virtual ~IAllocator() {}
 
-			virtual	void	deallocate(pointer p, size_type n) = 0;
-			virtual pointer	allocate(size_type n) = 0;
-			virtual void	construct( pointer p, const_reference val ) = 0;
-			virtual void	destroy(pointer p) = 0;
+			virtual	void		deallocate(pointer p, size_type n) = 0;
+			virtual pointer		allocate(size_type n) = 0;
+			virtual void		construct( pointer p, const_reference val ) = 0;
+			virtual void		destroy(pointer p) = 0;
+			virtual size_type	max_size(void) const = 0;
 	};
 
 	class IWatcher
@@ -132,7 +131,8 @@ namespace {
 				_timeCalledDealloc(0),
 				_timeCalledAlloc(0),
 				_timeCalledConstr(0),
-				_timeCalledDestr(0)
+				_timeCalledDestr(0),
+				_timeCalledMaxSize(0)
 			{return;}
 
 			virtual ~WrapAllocatorWatcher() {}
@@ -144,11 +144,13 @@ namespace {
 			int		getTimesAlloc(void) const {return (this->_timeCalledAlloc);}
 			int		getTimesConstr(void) const {return (this->_timeCalledConstr);}
 			int		getTimesDestr(void) const {return (this->_timeCalledDestr);}
+			int		getTimesMaxSize(void) const {return (this->_timeCalledMaxSize);}
 
 			void	incTimesDealloc(void) {if (this->_isWatching == 0) return; this->_timeCalledDealloc++;}
 			void	incTimesAlloc(void) {if (this->_isWatching == 0) return; this->_timeCalledAlloc++;}
 			void	incTimesConstr(void) {if (this->_isWatching == 0) return; this->_timeCalledConstr++;}
 			void	incTimesDestr(void) {if (this->_isWatching == 0) return; this->_timeCalledDestr++;}
+			void	incTimesMaxSize(void) {if (this->_isWatching == 0) return; this->_timeCalledMaxSize++;}
 
 		private: 
 			bool	_isWatching;
@@ -156,6 +158,7 @@ namespace {
 			int		_timeCalledAlloc;
 			int		_timeCalledConstr;
 			int		_timeCalledDestr;
+			int		_timeCalledMaxSize;
 
 	};
 
@@ -211,6 +214,13 @@ namespace {
 				if (this->_watcher)
 					this->_watcher->incTimesDestr();
 				return (this->_alloc.destroy(p));
+			}
+
+			virtual size_type	max_size(void) const
+			{
+				if (this->_watcher)
+					this->_watcher->incTimesMaxSize();
+				return (this->_alloc.max_size());
 			}
 
 			void	setWatcher(WrapAllocatorWatcher *watcher){this->_watcher = watcher;}
@@ -312,6 +322,8 @@ namespace {
 			// watcher help you see the calls to the allocator function inside the vector
 			WrapAllocatorWatcher						watcher;
 
+			std::vector< Type >	witnessEmptyVect;
+
 			// Declares the variables the test want to use.
 			Vector	v0_;
 			Vector	v1_;
@@ -328,12 +340,33 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, TestReserve)
+	{
+		size_t max_elements = 32;
+		this->v0_.reserve(max_elements);
+	}
+
+	TYPED_TEST(VectorTest, TestMaxSize)
+	{
+		this->v0_.max_size();
+		EXPECT_EQ(this->v0_.max_size(), this->witnessEmptyVect.max_size());
+		EXPECT_EQ(this->v1_.max_size(), this->witnessEmptyVect.max_size());
+		EXPECT_EQ(this->v2_.max_size(), this->witnessEmptyVect.max_size());
+	}
+
+	TYPED_TEST(VectorTest, TestEmpty)
+	{
+		EXPECT_EQ(this->v0_.empty(), true);
+		EXPECT_EQ(this->v1_.empty(), false);
+		EXPECT_EQ(this->v2_.empty(), false);
+	}
+
 	TYPED_TEST(VectorTest, TestBack)
 	{
-		EXPECT_EQ(this->v2_.back(), (size_t)7);
+		EXPECT_EQ(this->v2_.back(), size_t(7));
 		this->v2_.pop_back();
 		this->v2_.pop_back();
-		EXPECT_EQ(this->v2_.back(), (size_t)5);
+		EXPECT_EQ(this->v2_.back(), size_t(5));
 	}
 
 	TYPED_TEST(VectorTest, TestData)
@@ -355,17 +388,17 @@ namespace {
 	}
 	TYPED_TEST(VectorTest, TestCapacity)
 	{
-		EXPECT_EQ(this->v0_.capacity(), (size_t)0);
+		EXPECT_EQ(this->v0_.capacity(), size_t(0));
 		for (int i = 0; i < 8; i++)
 			this->v0_.push_back(42);
 		for (int i = 0; i < 10; i++)
 			this->v0_.pop_back();
-		EXPECT_EQ(this->v0_.capacity(), (size_t)8);
+		EXPECT_EQ(this->v0_.capacity(), size_t(8));
 	}
 
 	TYPED_TEST(VectorTest, 3TestOperatorEQ)
 	{
-		this->v0_ = this->v0_; // Make to not modify anything if you are calling operator= on itself with (this == &rhs)
+		this->v0_ = this->v0_; // Make sure not to modify anything if you are calling operator= on itself with (this == &rhs)
 	}
 
 	TYPED_TEST(VectorTest, 2TestOperatorEQ)
@@ -385,8 +418,8 @@ namespace {
 			// Test setup
 			for (int i = 0; i < 42; i++)
 				wV1.push_back(42 + i);
-			EXPECT_EQ(wV0.size(), (size_t)0);
-			EXPECT_EQ(wV1.size(), (size_t)42);
+			EXPECT_EQ(wV0.size(), size_t(0));
+			EXPECT_EQ(wV1.size(), size_t(42));
 
 			this->watcher.watch();
 			wV1 = wV0;
@@ -422,8 +455,8 @@ namespace {
 			// Test setup
 			for (int i = 0; i < 42; i++)
 				wV1.push_back(42 + i);
-			EXPECT_EQ(wV0.size(), (size_t)0);
-			EXPECT_EQ(wV1.size(), (size_t)42);
+			EXPECT_EQ(wV0.size(), size_t(0));
+			EXPECT_EQ(wV1.size(), size_t(42));
 
 			this->watcher.watch();
 			wV0 = wV1;
@@ -455,8 +488,8 @@ namespace {
 			wAlloc1.setWatcher(&this->watcher);
 
 			// Test setup
-			EXPECT_EQ(wV0.size(), (size_t)0);
-			EXPECT_EQ(wV1.size(), (size_t)0);
+			EXPECT_EQ(wV0.size(), size_t(0));
+			EXPECT_EQ(wV1.size(), size_t(0));
 
 			this->watcher.watch();
 			wV0 = wV1;
@@ -473,23 +506,23 @@ namespace {
 
 	TYPED_TEST(VectorTest, TestDefaultConstructor)
 	{
-		EXPECT_EQ(this->v0_.size(), (size_t)0);
-		EXPECT_EQ(this->v0_.capacity(), (size_t)0);
+		EXPECT_EQ(this->v0_.size(), size_t(0));
+		EXPECT_EQ(this->v0_.capacity(), size_t(0));
 
 		// Testing to remove elements on an empty vector:
 		this->v0_.pop_back();
 		this->v0_.pop_back();
 		this->v0_.pop_back();
 
-		EXPECT_EQ(this->v0_.size(), (size_t)0);
-		EXPECT_EQ(this->v0_.capacity(), (size_t)0);
+		EXPECT_EQ(this->v0_.size(), size_t(0));
+		EXPECT_EQ(this->v0_.capacity(), size_t(0));
 	}
 
 	TYPED_TEST(VectorTest, TestCapacitySize)
 	{
-		EXPECT_EQ(this->v0_.size(), (size_t)0);
-		EXPECT_EQ(this->v1_.size(), (size_t)1);
-		EXPECT_EQ(this->v2_.size(), (size_t)7);
+		EXPECT_EQ(this->v0_.size(), size_t(0));
+		EXPECT_EQ(this->v1_.size(), size_t(1));
+		EXPECT_EQ(this->v2_.size(), size_t(7));
 	}
 
 	TYPED_TEST(VectorTest, TestModifierPopBack)
@@ -498,9 +531,9 @@ namespace {
 		this->v1_.pop_back();
 		this->v2_.pop_back();
 
-		EXPECT_EQ(this->v0_.size(), (size_t)0);
-		EXPECT_EQ(this->v1_.size(), (size_t)0);
-		EXPECT_EQ(this->v2_.size(), (size_t)6);
+		EXPECT_EQ(this->v0_.size(), size_t(0));
+		EXPECT_EQ(this->v1_.size(), size_t(0));
+		EXPECT_EQ(this->v2_.size(), size_t(6));
 	}
 	
 	TYPED_TEST(VectorTest, TestOperatorElementAccess)
@@ -531,9 +564,9 @@ namespace {
 		// 0) Existance
 		this->v1_.assign(5, 'a');
 		// 1) Updating the size
-		EXPECT_EQ(this->v1_.size(), (size_t)5);
+		EXPECT_EQ(this->v1_.size(), size_t(5));
 		// 2) Updating the value
-		EXPECT_EQ(this->v1_.capacity(), (size_t)8);
+		EXPECT_EQ(this->v1_.capacity(), size_t(8));
 		// 3) Do not accept garbage
 		EXPECT_THROW({
 			try
@@ -556,8 +589,8 @@ namespace {
 		this->v1_.assign(size, 'a');
 		for (size_t i = 0; i < size; i++)
 			EXPECT_EQ(this->v1_[i], 'a');
-		EXPECT_EQ(this->v1_.size(), (size_t)1);
-		EXPECT_EQ(this->v1_.capacity(), (size_t)1);
+		EXPECT_EQ(this->v1_.size(), size_t(1));
+		EXPECT_EQ(this->v1_.capacity(), size_t(1));
 
 		typedef WrapAllocator< TypeParam >				WrapAlloc;
 		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
@@ -582,8 +615,8 @@ namespace {
 			this->watcher.stopwatch();
 			// We are not interested on what is happening inside the destructor that why we call watch stop.
 
-			EXPECT_EQ(wVect.size(), (size_t)3);
-			EXPECT_EQ(wVect.capacity(), (size_t)8);
+			EXPECT_EQ(wVect.size(), size_t(3));
+			EXPECT_EQ(wVect.capacity(), size_t(8));
 		}
 		EXPECT_EQ(this->watcher.getTimesAlloc(), 0);
 		EXPECT_EQ(this->watcher.getTimesDealloc(), 0);
@@ -617,8 +650,8 @@ namespace {
 			wVect.assign(100, 'a');
 			this->watcher.stopwatch();
 			// We are not interested on what is happening inside the destructor that why we call watch stop.
-			EXPECT_EQ(wVect.size(), (size_t)100);
-			EXPECT_EQ(wVect.capacity(), (size_t)128);
+			EXPECT_EQ(wVect.size(), size_t(100));
+			EXPECT_EQ(wVect.capacity(), size_t(128));
 		}
 		EXPECT_EQ(this->watcher.getTimesAlloc(), 1);
 		EXPECT_EQ(this->watcher.getTimesDealloc(), 1);
@@ -628,8 +661,7 @@ namespace {
 
 //////////////////OBJECTS TESTS////////////////////////////
 
-	//TYPED_TEST(VectorTest, DISABLED_TestSIGNAL)
-	TYPED_TEST(VectorTest, TestSIGNAL)
+	TYPED_TEST(VectorTest, DISABLED_TestSIGNAL)
 	{
 		// Calling front on empty vector is undefined.
 		// Those tests takes some time so we regroup them in the same test.
@@ -689,7 +721,6 @@ namespace {
 			{
 				EXPECT_STREQ("vector::_M_range_check: __n (which is 0) >= this->size() (which is 0)", e.what());
 				throw;
-
 			}
 			}, std::out_of_range);
 
@@ -703,7 +734,6 @@ namespace {
 			{
 				EXPECT_STREQ("vector::_M_range_check: __n (which is 0) >= this->size() (which is 0)", e.what());
 				throw;
-
 			}
 			}, std::out_of_range);
 	}
@@ -762,7 +792,6 @@ namespace {
 
 			Vector v4_;
 			Vector v5_;
-
 	};
 
 	typedef testing::Types< std::string > StringTypes;
@@ -770,7 +799,7 @@ namespace {
 
 	TYPED_TEST(VectorTestString, TestStringDefaultConstructor)
 	{
-		EXPECT_EQ(this->v4_.size(), (size_t)0);
+		EXPECT_EQ(this->v4_.size(), size_t(0));
 		// Test segfault here :
 		//EXPECT_EQ(this->v4_[0], (char)0);
 
@@ -782,12 +811,12 @@ namespace {
 
 	TYPED_TEST(VectorTestString, TestStringSize)
 	{
-		EXPECT_EQ(this->v5_.size(), (size_t)3);
+		EXPECT_EQ(this->v5_.size(), size_t(3));
 		this->v5_.push_back("Toto is now inside vector");
-		EXPECT_EQ(this->v5_.size(), (size_t)4);
+		EXPECT_EQ(this->v5_.size(), size_t(4));
 		this->v5_.pop_back();
 		this->v5_.pop_back();
-		EXPECT_EQ(this->v5_.size(), (size_t)2);
+		EXPECT_EQ(this->v5_.size(), size_t(2));
 	}
 
 	TYPED_TEST(VectorTestString, TestStringPushBack)
@@ -821,9 +850,4 @@ namespace {
 		EXPECT_EQ(this->watcher.getTimesDestr(), 1);
 		EXPECT_EQ(this->watcher.getTimesConstr(), 1);
 	}
-		/*
-			*/
-
-/*
-*/
 }  // namespace
