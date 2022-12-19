@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   vector_test.cpp                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jfrancai <jfrancai@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/16 15:19:38 by jfrancai          #+#    #+#             */
-/*   Updated: 2022/12/19 14:04:11 by jfrancai         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 /*
  * Usefull links :
  * Reference Testing	: https://google.github.io/googletest/reference/testing.html
@@ -344,6 +332,7 @@ namespace {
 	{
 		size_t max_elements = 32;
 		this->v0_.reserve(max_elements);
+
 	}
 
 	TYPED_TEST(VectorTest, TestReserve_CapacityUpdates)
@@ -390,6 +379,7 @@ namespace {
 		this->v0_.max_size();
 		EXPECT_EQ(this->v0_.max_size(), size_t(this->witnessEmptyVect.max_size()));
 		EXPECT_EQ(this->v1_.max_size(), size_t(this->witnessEmptyVect.max_size()));
+		EXPECT_EQ(this->v2_.max_size(), size_t(this->witnessEmptyVect.max_size()));
 
 		{
 			typedef WrapAllocator< TypeParam >				WrapAlloc;
