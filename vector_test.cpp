@@ -140,6 +140,15 @@ namespace {
 			void	incTimesDestr(void) {if (this->_isWatching == 0) return; this->_timeCalledDestr++;}
 			void	incTimesMaxSize(void) {if (this->_isWatching == 0) return; this->_timeCalledMaxSize++;}
 
+			void	initWatcher(void) {
+				_isWatching = false;
+				_timeCalledDealloc = 0;
+				_timeCalledAlloc = 0;
+				_timeCalledConstr = 0;
+				_timeCalledDestr = 0;
+				_timeCalledMaxSize = 0;
+			}
+
 		private: 
 			bool	_isWatching;
 			int		_timeCalledDealloc;
@@ -165,10 +174,9 @@ namespace {
 			typedef std::size_t		size_type;
 			typedef std::ptrdiff_t	difference_type;
 
-
-			WrapAllocator(void) : 
+			WrapAllocator(WrapAllocatorWatcher& wrapAllocatorWatcher) : 
 				_alloc(),
-				_watcher(NULL)
+				_watcher(wrapAllocatorWatcher)
 			{
 				return ;
 			}
@@ -180,42 +188,36 @@ namespace {
 			 * Member functions
 			 */
 			virtual void	deallocate(pointer p, size_type n) {
-				if (this->_watcher)
-					this->_watcher->incTimesDealloc();
+				this->_watcher.incTimesDealloc();
 				return (this->_alloc.deallocate(p, n));
 			}
 
 			virtual pointer	allocate(size_type n) {
-				if (this->_watcher)
-					this->_watcher->incTimesAlloc();
+				this->_watcher.incTimesAlloc();
 				return (this->_alloc.allocate(n));
 			}
 
 			virtual void	construct( pointer p, const_reference val) {
-				if (this->_watcher)
-					this->_watcher->incTimesConstr();
+				this->_watcher.incTimesConstr();
 				return (this->_alloc.construct(p, val));
 			}
 
 			virtual void	destroy(pointer p)
 			{
-				if (this->_watcher)
-					this->_watcher->incTimesDestr();
+				this->_watcher.incTimesDestr();
 				return (this->_alloc.destroy(p));
 			}
 
 			virtual size_type	max_size(void) const
 			{
-				if (this->_watcher)
-					this->_watcher->incTimesMaxSize();
+				this->_watcher.incTimesMaxSize();
 				return (this->_alloc.max_size());
 			}
 
-			void	setWatcher(WrapAllocatorWatcher *watcher){this->_watcher = watcher;}
-
 		private:
 			std::allocator< Type >	_alloc;
-			WrapAllocatorWatcher	*_watcher;
+			WrapAllocatorWatcher	&_watcher;
+			WrapAllocator(void);
 	};
 
 	//		To create a test:
@@ -242,22 +244,19 @@ namespace {
 		// Open a new scope so the watcher is at a higher level than the vector.
 		// Now it can see what is happening inside its destructor.
 		{
-			// Construct the tested vector
-			ft::vector< int, WrapAlloc > intVector;
+			// Construct an wrapped allocator that use a watcher
+			WrapAlloc wAlloc(watcher);
 
-			// Then get the constructed allocator inside the tested vector
-			WrapAlloc &wAlloc = intVector.getAlloc();
-
-			// Put the watcher inside the vector
-			wAlloc.setWatcher(&watcher);
+			// Construct the tested vector with copy of the wAlloc object
+			ft::vector< int, WrapAlloc > intVector(wAlloc);
 
 			// Start watching
 			watcher.watch();
 		}
-		EXPECT_EQ(watcher.getTimesAlloc(), 0);
-		EXPECT_EQ(watcher.getTimesDealloc(), 1);
-		EXPECT_EQ(watcher.getTimesConstr(), 0);
-		EXPECT_EQ(watcher.getTimesDestr(), 0);
+		EXPECT_EQ(watcher.getTimesAlloc(), size_t(0));
+		EXPECT_EQ(watcher.getTimesDealloc(), size_t(1));
+		EXPECT_EQ(watcher.getTimesConstr(), size_t(0));
+		EXPECT_EQ(watcher.getTimesDestr(), size_t(0));
 	}
 
 	//		To create a fixture:
@@ -279,18 +278,18 @@ namespace {
 	
 
 //////////////////DEFAULT TYPES TESTS////////////////////////////
+	const static int lenv2 = 7;
+
 	template <typename Type>
 	class VectorTest : public testing::Test
 	{
 		protected:
 			// Default constructor initialize the class's reference
-			VectorTest() :
-				wAlloc0_(this->wV0_.getAlloc())
+			VectorTest()
 			{
 				return ;
 			}
 
-			const static int lenv2 = 7;
 			void SetUp()
 			{
 				v1_.push_back(42);
@@ -300,6 +299,7 @@ namespace {
 
 			void TearDown()
 			{
+				this->watcher.initWatcher();
 			}
 
 			typedef ft::vector< Type >					Vector;
@@ -316,9 +316,6 @@ namespace {
 			Vector	v0_;
 			Vector	v1_;
 			Vector	v2_;
-
-			wVector		wV0_;
-			WrapAlloc	&wAlloc0_;
 	};
 
 #ifdef INT_ONLY
@@ -328,11 +325,15 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, TestCopyConstructor_IsExisting)
+	{
+		ft::vector< TypeParam > tmp(this->v0_);
+	}
+
 	TYPED_TEST(VectorTest, TestReserve_IsExisting)
 	{
 		size_t max_elements = 32;
 		this->v0_.reserve(max_elements);
-
 	}
 
 	TYPED_TEST(VectorTest, TestReserve_CapacityUpdates)
@@ -344,35 +345,60 @@ namespace {
 		EXPECT_EQ(this->v0_.capacity(), size_t(32));
 
 		this->v0_.reserve(44);
-		EXPECT_EQ(this->v0_.capacity(), size_t(64));
+		EXPECT_EQ(this->v0_.capacity(), size_t(44));
 
 		this->v0_.reserve(0);
-		EXPECT_EQ(this->v0_.capacity(), size_t(64));
+		EXPECT_EQ(this->v0_.capacity(), size_t(44));
+
+		this->v2_.reserve(100);
+
+		EXPECT_EQ(this->v2_.capacity(), size_t(100));
+		EXPECT_EQ(this->v2_.size(), lenv2);
+		for (TypeParam i = 0; i < lenv2; i++)
+			EXPECT_EQ(this->v2_[i], i + 1);
 	}
 
 	TYPED_TEST(VectorTest, TestReserve_Allocation)
 	{
-		{
-			typedef WrapAllocator< TypeParam >				WrapAlloc;
-			typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+		typedef WrapAllocator< TypeParam >				WrapAlloc;
+		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
 
+		{
 			// Test set up
-			wVector	wVect;
-			WrapAlloc &wAlloc = wVect.getAlloc();
-			wAlloc.setWatcher(&this->watcher);
+			WrapAlloc wAlloc(this->watcher);
+			wVector	wVect(wAlloc);
 
 			// Watch
 			this->watcher.watch();
 			wVect.reserve(0);
 			this->watcher.stopwatch();
 			// endWatch
-			EXPECT_EQ(this->watcher.getTimesAlloc(), 0);
-			EXPECT_EQ(this->watcher.getTimesDealloc(), 0);
-			EXPECT_EQ(this->watcher.getTimesDestr(), 0);
-			EXPECT_EQ(this->watcher.getTimesConstr(), 0);
+			EXPECT_EQ(this->watcher.getTimesAlloc(), size_t(0));
+			EXPECT_EQ(this->watcher.getTimesDealloc(), size_t(0));
+			EXPECT_EQ(this->watcher.getTimesDestr(), size_t(0));
+			EXPECT_EQ(this->watcher.getTimesConstr(), size_t(0));
+			EXPECT_EQ(wVect.size(), size_t(0));
+		}
+
+		{
+			// Test set up
+			WrapAlloc	wAlloc(this->watcher);
+			wVector		wVect(wAlloc);
+
+			wVect.push_back(42);
+			wVect.push_back(1);
+
+			// Watch
+			this->watcher.watch();
+			wVect.reserve(35);
+			this->watcher.stopwatch();
+			// endWatch
+			EXPECT_EQ(this->watcher.getTimesAlloc(), size_t(1));
+			EXPECT_EQ(this->watcher.getTimesDealloc(), size_t(1));
+			EXPECT_LE(this->watcher.getTimesDestr(), size_t(2));
+			EXPECT_LE(this->watcher.getTimesConstr(), size_t(2));
 		}
 	}
-
 
 	TYPED_TEST(VectorTest, TestMaxSize)
 	{
@@ -381,14 +407,13 @@ namespace {
 		EXPECT_EQ(this->v1_.max_size(), size_t(this->witnessEmptyVect.max_size()));
 		EXPECT_EQ(this->v2_.max_size(), size_t(this->witnessEmptyVect.max_size()));
 
-		{
-			typedef WrapAllocator< TypeParam >				WrapAlloc;
-			typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+		typedef WrapAllocator< TypeParam >				WrapAlloc;
+		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
 
+		{
 			// Test set up
-			wVector	wVect;
-			WrapAlloc &wAlloc = wVect.getAlloc();
-			wAlloc.setWatcher(&this->watcher);
+			WrapAlloc wAlloc(this->watcher);
+			wVector	wVect(wAlloc);
 
 			// Watch
 			this->watcher.watch();
@@ -428,7 +453,7 @@ namespace {
 	TYPED_TEST(VectorTest, TestAt)
 	{
 		EXPECT_EQ(this->v1_.at(0), 42);
-		for (TypeParam i = 0; i < this->lenv2; i++)
+		for (TypeParam i = 0; i < lenv2; i++)
 			EXPECT_EQ(this->v2_.at(i), i + 1);
 	}
 	TYPED_TEST(VectorTest, TestCapacity)
@@ -452,13 +477,11 @@ namespace {
 		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
 
 		{
-			wVector	wV0;
-			WrapAlloc &wAlloc0 = wV0.getAlloc();
-			wAlloc0.setWatcher(&this->watcher);
+			WrapAlloc wAlloc0(this->watcher);
+			wVector	wV0(wAlloc0);
 
-			wVector	wV1;
-			WrapAlloc &wAlloc1 = wV1.getAlloc();
-			wAlloc1.setWatcher(&this->watcher);
+			WrapAlloc wAlloc1(this->watcher);
+			wVector	wV1(wAlloc1);
 
 			// Test setup
 			for (int i = 0; i < 42; i++)
@@ -479,8 +502,6 @@ namespace {
 		EXPECT_EQ(this->watcher.getTimesDealloc(), 1);
 		EXPECT_EQ(this->watcher.getTimesDestr(), 42);
 		EXPECT_EQ(this->watcher.getTimesConstr(), 0);
-		/*
-		*/
 	}
 
 	TYPED_TEST(VectorTest, 1TestOperatorEQ)
@@ -489,13 +510,11 @@ namespace {
 		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
 
 		{
-			wVector	wV0;
-			WrapAlloc &wAlloc0 = wV0.getAlloc();
-			wAlloc0.setWatcher(&this->watcher);
+			WrapAlloc wAlloc0(this->watcher);
+			wVector	wV0(wAlloc0);
 
-			wVector	wV1;
-			WrapAlloc &wAlloc1 = wV1.getAlloc();
-			wAlloc1.setWatcher(&this->watcher);
+			WrapAlloc wAlloc1(this->watcher);
+			wVector	wV1(wAlloc1);
 
 			// Test setup
 			for (int i = 0; i < 42; i++)
@@ -524,13 +543,11 @@ namespace {
 		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
 
 		{
-			wVector	wV0;
-			WrapAlloc &wAlloc0 = wV0.getAlloc();
-			wAlloc0.setWatcher(&this->watcher);
+			WrapAlloc wAlloc0(this->watcher);
+			wVector	wV0(wAlloc0);
 
-			wVector	wV1;
-			WrapAlloc &wAlloc1 = wV1.getAlloc();
-			wAlloc1.setWatcher(&this->watcher);
+			WrapAlloc wAlloc1(this->watcher);
+			wVector	wV1(wAlloc1);
 
 			// Test setup
 			EXPECT_EQ(wV0.size(), size_t(0));
@@ -587,7 +604,7 @@ namespace {
 		EXPECT_EQ(this->v1_[0], 42);
 
 		//v2
-		for (int i = 0; i < this->lenv2; i++)
+		for (int i = 0; i < lenv2; i++)
 			EXPECT_EQ(this->v2_[i], i + 1);
 	}
 
@@ -611,9 +628,8 @@ namespace {
 			typedef ft::vector< TypeParam, WrapAlloc >		wVector;
 
 			// Test set up
-			wVector	wVect;
-			WrapAlloc &wAlloc = wVect.getAlloc();
-			wAlloc.setWatcher(&this->watcher);
+			WrapAlloc wAlloc(this->watcher);
+			wVector	wVect(wAlloc);
 
 			// Watch
 			this->watcher.watch();
@@ -670,9 +686,8 @@ namespace {
 		// Enforce not to call any deallocate or allocate in this case (Let's push some more object also).
 		{
 			// Test set up
-			wVector	wVect;
-			WrapAlloc &wAlloc = wVect.getAlloc();
-			wAlloc.setWatcher(&this->watcher);
+			WrapAlloc wAlloc(this->watcher);
+			wVector	wVect(wAlloc);
 
 			wVect.push_back(42);
 			wVect.push_back(21);
@@ -710,9 +725,8 @@ namespace {
 		// Enforce not to call any deallocate or allocate in this case (Let's push some more object also).
 		{
 			// Test set up
-			wVector	wVect;
-			WrapAlloc &wAlloc = wVect.getAlloc();
-			wAlloc.setWatcher(&this->watcher);
+			WrapAlloc wAlloc(this->watcher);
+			wVector	wVect(wAlloc);
 
 			wVect.push_back(42);
 			////////////////////
@@ -929,9 +943,8 @@ namespace {
 		typedef ft::vector<TypeParam, WrapAlloc> wVector;
 
 		{
-			wVector	wVect;
-			WrapAlloc &wAlloc = wVect.getAlloc();
-			wAlloc.setWatcher(&this->watcher);
+			WrapAlloc wAlloc(this->watcher);
+			wVector	wVect(wAlloc);
 
 			this->watcher.watch();
 			wVect.push_back("toto is born");
