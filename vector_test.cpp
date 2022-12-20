@@ -58,9 +58,9 @@
  *
  * Constructors
  *
- * 	1)	vector();
- * 	2)	vector( const vector& other );
- * 	3)	explicit vector( const Allocator& alloc );
+ * 	1)	vector(); ok
+ * 	2)	vector( const vector& other ); ok
+ * 	3)	explicit vector( const Allocator& alloc ); ok
  * 	4)	explicit vector( size_type count, const T& value = T(), const Allocator& alloc = Allocator());
  * 	5)	template< class InputIt > vector( InputIt first, InputIt last, const Allocator& alloc = Allocator() );
  *
@@ -327,7 +327,46 @@ namespace {
 
 	TYPED_TEST(VectorTest, TestCopyConstructor_IsExisting)
 	{
-		ft::vector< TypeParam > tmp(this->v0_);
+		{
+			ft::vector< TypeParam > myVect(this->v0_);
+
+			EXPECT_EQ(this->v0_.capacity(), myVect.capacity());
+			EXPECT_EQ(this->v0_.size(), myVect.size());
+			EXPECT_EQ(this->v0_.max_size(), myVect.max_size());
+			EXPECT_EQ(this->v0_.empty(), myVect.empty());
+			EXPECT_EQ(this->v0_.get_allocator() == myVect.get_allocator(), true);
+			EXPECT_NE(this->v0_.data(), myVect.data());
+		}
+
+		{
+			ft::vector< TypeParam > myVect(this->v1_);
+
+			EXPECT_EQ(this->v1_.capacity(), myVect.capacity());
+			EXPECT_EQ(this->v1_.size(), myVect.size());
+			EXPECT_EQ(this->v1_.max_size(), myVect.max_size());
+			EXPECT_EQ(this->v1_.empty(), myVect.empty());
+			EXPECT_EQ(this->v1_.get_allocator() == myVect.get_allocator(), true);
+			EXPECT_NE(this->v1_.data(), myVect.data());
+
+			size_t size = this->v1_.size();
+			for (size_t i = 0; i < size; i++)
+				EXPECT_EQ(myVect[i], this->v1_[i]);
+		}
+
+		{
+			ft::vector< TypeParam > myVect(this->v2_);
+
+			EXPECT_EQ(this->v2_.capacity(), myVect.capacity());
+			EXPECT_EQ(this->v2_.size(), myVect.size());
+			EXPECT_EQ(this->v2_.max_size(), myVect.max_size());
+			EXPECT_EQ(this->v2_.empty(), myVect.empty());
+			EXPECT_EQ(this->v2_.get_allocator() == myVect.get_allocator(), true);
+			EXPECT_NE(this->v2_.data(), myVect.data());
+
+			size_t size = this->v2_.size();
+			for (size_t i = 0; i < size; i++)
+				EXPECT_EQ(myVect[i], this->v2_[i]);
+		}
 	}
 
 	TYPED_TEST(VectorTest, TestReserve_IsExisting)
