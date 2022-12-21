@@ -253,10 +253,10 @@ namespace {
 			// Start watching
 			watcher.watch();
 		}
-		EXPECT_EQ(watcher.getTimesAlloc(), size_t(0));
-		EXPECT_EQ(watcher.getTimesDealloc(), size_t(1));
-		EXPECT_EQ(watcher.getTimesConstr(), size_t(0));
-		EXPECT_EQ(watcher.getTimesDestr(), size_t(0));
+		EXPECT_EQ(watcher.getTimesAlloc(), (0));
+		EXPECT_EQ(watcher.getTimesDealloc(), (1));
+		EXPECT_EQ(watcher.getTimesConstr(), (0));
+		EXPECT_EQ(watcher.getTimesDestr(), (0));
 	}
 
 	//		To create a fixture:
@@ -335,7 +335,7 @@ namespace {
 			EXPECT_EQ(this->v0_.max_size(), myVect.max_size());
 			EXPECT_EQ(this->v0_.empty(), myVect.empty());
 			EXPECT_EQ(this->v0_.get_allocator() == myVect.get_allocator(), true);
-			EXPECT_NE(this->v0_.data(), myVect.data());
+			EXPECT_EQ(this->v0_.data(), myVect.data());
 		}
 
 		{
@@ -392,7 +392,7 @@ namespace {
 		this->v2_.reserve(100);
 
 		EXPECT_EQ(this->v2_.capacity(), size_t(100));
-		EXPECT_EQ(this->v2_.size(), lenv2);
+		EXPECT_EQ(this->v2_.size(), (size_t)lenv2);
 		for (TypeParam i = 0; i < lenv2; i++)
 			EXPECT_EQ(this->v2_[i], i + 1);
 	}
@@ -412,10 +412,10 @@ namespace {
 			wVect.reserve(0);
 			this->watcher.stopwatch();
 			// endWatch
-			EXPECT_EQ(this->watcher.getTimesAlloc(), size_t(0));
-			EXPECT_EQ(this->watcher.getTimesDealloc(), size_t(0));
-			EXPECT_EQ(this->watcher.getTimesDestr(), size_t(0));
-			EXPECT_EQ(this->watcher.getTimesConstr(), size_t(0));
+			EXPECT_EQ(this->watcher.getTimesAlloc(), (0));
+			EXPECT_EQ(this->watcher.getTimesDealloc(), (0));
+			EXPECT_EQ(this->watcher.getTimesDestr(), (0));
+			EXPECT_EQ(this->watcher.getTimesConstr(), (0));
 			EXPECT_EQ(wVect.size(), size_t(0));
 		}
 
@@ -432,10 +432,10 @@ namespace {
 			wVect.reserve(35);
 			this->watcher.stopwatch();
 			// endWatch
-			EXPECT_EQ(this->watcher.getTimesAlloc(), size_t(1));
-			EXPECT_EQ(this->watcher.getTimesDealloc(), size_t(1));
-			EXPECT_LE(this->watcher.getTimesDestr(), size_t(2));
-			EXPECT_LE(this->watcher.getTimesConstr(), size_t(2));
+			EXPECT_EQ(this->watcher.getTimesAlloc(), (1));
+			EXPECT_EQ(this->watcher.getTimesDealloc(), (1));
+			EXPECT_LE(this->watcher.getTimesDestr(), (2));
+			EXPECT_LE(this->watcher.getTimesConstr(), (2));
 		}
 	}
 
@@ -472,10 +472,10 @@ namespace {
 
 	TYPED_TEST(VectorTest, TestBack)
 	{
-		EXPECT_EQ(this->v2_.back(), size_t(7));
+		EXPECT_EQ(this->v2_.back(), (7));
 		this->v2_.pop_back();
 		this->v2_.pop_back();
-		EXPECT_EQ(this->v2_.back(), size_t(5));
+		EXPECT_EQ(this->v2_.back(), (5));
 	}
 
 	TYPED_TEST(VectorTest, TestData)
