@@ -325,6 +325,50 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, TestCountConstructor)
+	{
+		// One param
+		ft::vector< TypeParam > myVect0(0);
+		EXPECT_EQ(myVect0.size(), 0);
+		EXPECT_EQ(myVect0.capacity(), 0);
+		ft::vector< TypeParam > myVect1(42);
+		EXPECT_EQ(myVect1.size(), 42);
+		EXPECT_EQ(myVect1.capacity(), 42);
+
+		// Two param
+		ft::vector< TypeParam > myVect2(3, 42);
+		for (size_t i = 0; i < 3; i++)
+			EXPECT_EQ(myVect2[i], 42);
+		EXPECT_EQ(myVect2.size(), size_t(3));
+		EXPECT_EQ(myVect2.capacity(), size_t(3));
+
+		// Three param
+		ft::vector< TypeParam > myVect3(32, 42, myVect2.get_allocator());
+		EXPECT_EQ(myVect3.size(), size_t(32));
+		EXPECT_EQ(myVect3.capacity(), size_t(32));
+
+		typedef WrapAllocator< TypeParam >				WrapAlloc;
+		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+		{
+			// Test set up
+			WrapAlloc wAlloc(this->watcher);
+
+			// Watch
+			this->watcher.watch();
+			wVector myVect4(32, 42, wAlloc);
+			this->watcher.stopwatch();
+
+			EXPECT_EQ(myVect4.size(), size_t(32));
+			EXPECT_EQ(myVect4.capacity(), size_t(32));
+			// endWatch
+			EXPECT_EQ(this->watcher.getTimesAlloc(), size_t(1));
+			EXPECT_EQ(this->watcher.getTimesDealloc(), size_t(0));
+			EXPECT_EQ(this->watcher.getTimesDestr(), size_t(0));
+			EXPECT_EQ(this->watcher.getTimesConstr(), size_t(32));
+		}
+	}
+
 	TYPED_TEST(VectorTest, TestCopyConstructor_IsExisting)
 	{
 		{
@@ -335,7 +379,7 @@ namespace {
 			EXPECT_EQ(this->v0_.max_size(), myVect.max_size());
 			EXPECT_EQ(this->v0_.empty(), myVect.empty());
 			EXPECT_EQ(this->v0_.get_allocator() == myVect.get_allocator(), true);
-			EXPECT_NE(this->v0_.data(), myVect.data());
+			EXPECT_EQ(this->v0_.data(), myVect.data());
 		}
 
 		{
@@ -847,7 +891,7 @@ namespace {
 				EXPECT_STREQ("vector::_M_range_check: __n (which is 0) >= this->size() (which is 0)", e.what());
 				throw;
 			}
-			}, std::out_of_range);
+		}, std::out_of_range);
 
 		// Calling const at
 		EXPECT_THROW({
@@ -860,7 +904,7 @@ namespace {
 				EXPECT_STREQ("vector::_M_range_check: __n (which is 0) >= this->size() (which is 0)", e.what());
 				throw;
 			}
-			}, std::out_of_range);
+		}, std::out_of_range);
 		
 		{
 			// Some const vector definition
@@ -878,7 +922,21 @@ namespace {
 					EXPECT_STREQ("vector::reserve", e.what());
 					throw;
 				}
-				}, std::length_error);
+			}, std::length_error);
+
+			// Calling CountConstructor with invalid param
+			EXPECT_THROW({
+
+				try
+				{
+					ft::vector< TypeParam > myVect(size_t(-1));
+				}
+				catch (const std::exception &e)
+				{
+					EXPECT_STREQ("cannot create std::vector larger than max_size()", e.what());
+					throw;
+				}
+			}, std::length_error);
 		}
 	}
 
