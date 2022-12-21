@@ -61,7 +61,7 @@
  * 	1)	vector(); ok
  * 	2)	vector( const vector& other ); ok
  * 	3)	explicit vector( const Allocator& alloc ); ok
- * 	4)	explicit vector( size_type count, const T& value = T(), const Allocator& alloc = Allocator());
+ * 	4)	explicit vector( size_type count, const T& value = T(), const Allocator& alloc = Allocator()); ok
  * 	5)	template< class InputIt > vector( InputIt first, InputIt last, const Allocator& alloc = Allocator() );
  *
  * Destructors
@@ -253,10 +253,10 @@ namespace {
 			// Start watching
 			watcher.watch();
 		}
-		EXPECT_EQ(watcher.getTimesAlloc(), size_t(0));
-		EXPECT_EQ(watcher.getTimesDealloc(), size_t(1));
-		EXPECT_EQ(watcher.getTimesConstr(), size_t(0));
-		EXPECT_EQ(watcher.getTimesDestr(), size_t(0));
+		EXPECT_EQ(watcher.getTimesAlloc(), (0));
+		EXPECT_EQ(watcher.getTimesDealloc(), (1));
+		EXPECT_EQ(watcher.getTimesConstr(), (0));
+		EXPECT_EQ(watcher.getTimesDestr(), (0));
 	}
 
 	//		To create a fixture:
@@ -361,6 +361,7 @@ namespace {
 
 			EXPECT_EQ(myVect4.size(), size_t(32));
 			EXPECT_EQ(myVect4.capacity(), size_t(32));
+
 			// endWatch
 			EXPECT_EQ(this->watcher.getTimesAlloc(), size_t(1));
 			EXPECT_EQ(this->watcher.getTimesDealloc(), size_t(0));
@@ -436,7 +437,7 @@ namespace {
 		this->v2_.reserve(100);
 
 		EXPECT_EQ(this->v2_.capacity(), size_t(100));
-		EXPECT_EQ(this->v2_.size(), lenv2);
+		EXPECT_EQ(this->v2_.size(), (size_t)lenv2);
 		for (TypeParam i = 0; i < lenv2; i++)
 			EXPECT_EQ(this->v2_[i], i + 1);
 	}
@@ -456,10 +457,10 @@ namespace {
 			wVect.reserve(0);
 			this->watcher.stopwatch();
 			// endWatch
-			EXPECT_EQ(this->watcher.getTimesAlloc(), size_t(0));
-			EXPECT_EQ(this->watcher.getTimesDealloc(), size_t(0));
-			EXPECT_EQ(this->watcher.getTimesDestr(), size_t(0));
-			EXPECT_EQ(this->watcher.getTimesConstr(), size_t(0));
+			EXPECT_EQ(this->watcher.getTimesAlloc(), (0));
+			EXPECT_EQ(this->watcher.getTimesDealloc(), (0));
+			EXPECT_EQ(this->watcher.getTimesDestr(), (0));
+			EXPECT_EQ(this->watcher.getTimesConstr(), (0));
 			EXPECT_EQ(wVect.size(), size_t(0));
 		}
 
@@ -476,10 +477,10 @@ namespace {
 			wVect.reserve(35);
 			this->watcher.stopwatch();
 			// endWatch
-			EXPECT_EQ(this->watcher.getTimesAlloc(), size_t(1));
-			EXPECT_EQ(this->watcher.getTimesDealloc(), size_t(1));
-			EXPECT_LE(this->watcher.getTimesDestr(), size_t(2));
-			EXPECT_LE(this->watcher.getTimesConstr(), size_t(2));
+			EXPECT_EQ(this->watcher.getTimesAlloc(), (1));
+			EXPECT_EQ(this->watcher.getTimesDealloc(), (1));
+			EXPECT_LE(this->watcher.getTimesDestr(), (2));
+			EXPECT_LE(this->watcher.getTimesConstr(), (2));
 		}
 	}
 
@@ -516,10 +517,10 @@ namespace {
 
 	TYPED_TEST(VectorTest, TestBack)
 	{
-		EXPECT_EQ(this->v2_.back(), size_t(7));
+		EXPECT_EQ(this->v2_.back(), (7));
 		this->v2_.pop_back();
 		this->v2_.pop_back();
-		EXPECT_EQ(this->v2_.back(), size_t(5));
+		EXPECT_EQ(this->v2_.back(), (5));
 	}
 
 	TYPED_TEST(VectorTest, TestData)
