@@ -395,7 +395,9 @@ namespace {
 
 			size_t size = this->v1_.size();
 			for (size_t i = 0; i < size; i++)
+			{
 				EXPECT_EQ(myVect[i], this->v1_[i]);
+			}
 		}
 
 		{
@@ -410,7 +412,9 @@ namespace {
 
 			size_t size = this->v2_.size();
 			for (size_t i = 0; i < size; i++)
+			{
 				EXPECT_EQ(myVect[i], this->v2_[i]);
+			}
 		}
 	}
 
@@ -505,7 +509,14 @@ namespace {
 			this->watcher.stopwatch();
 			// endWatch
 		}
+#ifdef __APPLE__
+		if (sizeof(TypeParam) == 1)
+			EXPECT_EQ(this->watcher.getTimesMaxSize(), 0);
+		else
+			EXPECT_EQ(this->watcher.getTimesMaxSize(), 1);
+#else
 		EXPECT_EQ(this->watcher.getTimesMaxSize(), 1);
+#endif
 	}
 
 	TYPED_TEST(VectorTest, TestEmpty)
@@ -728,7 +739,7 @@ namespace {
 		EXPECT_LE(this->watcher.getTimesDealloc(), 1); // EXPECT_LE because deallocation with size of 0 may be expected
 		EXPECT_EQ(this->watcher.getTimesDestr(), 0);
 		EXPECT_EQ(this->watcher.getTimesConstr(), 1);
-		EXPECT_EQ(this->watcher.getTimesMaxSize(), 1);
+		//EXPECT_EQ(this->watcher.getTimesMaxSize(), int(1));
 	}
 
 	TYPED_TEST(VectorTest, TestAssign_1_IsExisting)
