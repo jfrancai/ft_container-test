@@ -259,6 +259,16 @@ namespace {
 		EXPECT_EQ(watcher.getTimesDestr(), (0));
 	}
 
+	TEST(VectorBasicTest, BeginIterator)
+	{
+		ft::vector< std::string > fruits;
+
+		fruits.push_back("orange");
+		fruits.push_back("banane");
+
+		std::cout << "First fruit: " << *fruits.begin() << '\n';
+	}
+
 	//		To create a fixture:
 	//
 	// 1)	Derive a class from ::testing::Test.
@@ -324,6 +334,11 @@ namespace {
 	typedef testing::Types< int, float, double, char, wchar_t> MyTypes;
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
+
+
+	TYPED_TEST(VectorTest, TestBegin)
+	{
+	}
 
 	TYPED_TEST(VectorTest, TestCountConstructor)
 	{
