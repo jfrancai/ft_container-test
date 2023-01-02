@@ -344,11 +344,11 @@ namespace {
 	{
 		// One param
 		ft::vector< TypeParam > myVect0(0);
-		EXPECT_EQ(myVect0.size(), 0);
-		EXPECT_EQ(myVect0.capacity(), 0);
+		EXPECT_EQ(myVect0.size(), size_t(0));
+		EXPECT_EQ(myVect0.capacity(), size_t(0));
 		ft::vector< TypeParam > myVect1(42);
-		EXPECT_EQ(myVect1.size(), 42);
-		EXPECT_EQ(myVect1.capacity(), 42);
+		EXPECT_EQ(myVect1.size(), size_t(42));
+		EXPECT_EQ(myVect1.capacity(), size_t(42));
 
 		// Two param
 		ft::vector< TypeParam > myVect2(3, 42);
@@ -378,10 +378,10 @@ namespace {
 			EXPECT_EQ(myVect4.capacity(), size_t(32));
 
 			// endWatch
-			EXPECT_EQ(this->watcher.getTimesAlloc(), size_t(1));
-			EXPECT_EQ(this->watcher.getTimesDealloc(), size_t(0));
-			EXPECT_EQ(this->watcher.getTimesDestr(), size_t(0));
-			EXPECT_EQ(this->watcher.getTimesConstr(), size_t(32));
+			EXPECT_EQ(this->watcher.getTimesAlloc(), (1));
+			EXPECT_EQ(this->watcher.getTimesDealloc(), (0));
+			EXPECT_EQ(this->watcher.getTimesDestr(), (0));
+			EXPECT_EQ(this->watcher.getTimesConstr(), (32));
 		}
 	}
 
