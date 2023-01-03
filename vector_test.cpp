@@ -266,7 +266,7 @@ namespace {
 		fruits.push_back("orange");
 		fruits.push_back("banane");
 
-		std::cout << "First fruit: " << *fruits.begin() << '\n';
+		EXPECT_STREQ((*fruits.begin()).c_str(), "orange");
 	}
 
 	//		To create a fixture:
