@@ -270,6 +270,7 @@ namespace {
 		// Default construct
 		ft::vector< std::string >::iterator it0;
 		/* LegacyIterator */
+
 		// Copy assignable
 		it0 = fruits.begin();
 		EXPECT_STREQ((*it0).c_str(), "orange");
@@ -295,6 +296,38 @@ namespace {
 
 		EXPECT_STREQ((*it1).c_str(), "orange");
 		EXPECT_STREQ((*it0).c_str(), "banane");
+
+		// operator->
+		EXPECT_STREQ(it1->c_str(), "orange");
+		EXPECT_STREQ(it0->c_str(), "banane");
+
+		// post-inc
+		EXPECT_STREQ((it1++)->c_str(), "orange");
+		EXPECT_STREQ(it1->c_str(), "banane");
+		it0 = fruits.begin();
+		EXPECT_STREQ((*it0++).c_str(), "orange");
+
+		it0 = fruits.begin();
+		ft::vector< std::string >::iterator it0copy(it0);
+		it0copy++;
+		EXPECT_STREQ(it0->c_str(), "orange");
+		EXPECT_STREQ(it0copy->c_str(), "banane");
+
+		it0copy = it0;
+		EXPECT_TRUE(++it0 == ++it0copy);
+		EXPECT_STREQ(it0copy->c_str(), "banane");
+		EXPECT_STREQ(it0->c_str(), "banane");
+
+		// pre-inc
+		EXPECT_STREQ((--it1)->c_str(), "orange");
+		++it1;
+		EXPECT_STREQ((it1--)->c_str(), "banane");
+		EXPECT_STREQ(it1->c_str(), "orange");
+
+		EXPECT_TRUE(++it1 > --it0);
+		EXPECT_FALSE(it1 < it0);
+		EXPECT_TRUE(--it0copy <= it0);
+		EXPECT_TRUE(it0copy >= it0);
 	}
 
 	//		To create a fixture:
