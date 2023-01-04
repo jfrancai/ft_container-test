@@ -69,6 +69,7 @@
  */
 
 
+#include <algorithm>
 // Testing Library
 #include <gtest/gtest.h>
 // Mocking Library
@@ -259,14 +260,73 @@ namespace {
 		EXPECT_EQ(watcher.getTimesDestr(), (0));
 	}
 
-	TEST(VectorBasicTest, BeginIterator)
+	TEST(VectorBasicTest, Iterator)
 	{
 		ft::vector< std::string > fruits;
 
 		fruits.push_back("orange");
 		fruits.push_back("banane");
 
-		EXPECT_STREQ((*fruits.begin()).c_str(), "orange");
+		// Default construct
+		ft::vector< std::string >::iterator it0;
+
+		// Copy assignable
+		it0 = fruits.begin();
+		EXPECT_STREQ((*it0).c_str(), "orange");
+
+		// Copy construct
+		ft::vector< std::string >::iterator it1(it0);
+		EXPECT_STREQ((*it1).c_str(), "orange");
+
+		// Equality comparable
+		EXPECT_TRUE(it0 == it1);
+		// Inequality comparable
+		EXPECT_FALSE(it0 != it1);
+
+		// Pre-increment
+		++it1;
+		EXPECT_STREQ((*it1).c_str(), "banane");
+
+		EXPECT_FALSE(it0 == it1);
+		EXPECT_TRUE(it0 != it1);
+
+		// Swappable
+		std::swap(it0, it1);
+
+		EXPECT_STREQ((*it1).c_str(), "orange");
+		EXPECT_STREQ((*it0).c_str(), "banane");
+
+		// operator->
+		EXPECT_STREQ(it1->c_str(), "orange");
+		EXPECT_STREQ(it0->c_str(), "banane");
+
+		// post-inc
+		EXPECT_STREQ((it1++)->c_str(), "orange");
+		EXPECT_STREQ(it1->c_str(), "banane");
+		it0 = fruits.begin();
+		EXPECT_STREQ((*it0++).c_str(), "orange");
+
+		it0 = fruits.begin();
+		ft::vector< std::string >::iterator it0copy(it0);
+		it0copy++;
+		EXPECT_STREQ(it0->c_str(), "orange");
+		EXPECT_STREQ(it0copy->c_str(), "banane");
+
+		it0copy = it0;
+		EXPECT_TRUE(++it0 == ++it0copy);
+		EXPECT_STREQ(it0copy->c_str(), "banane");
+		EXPECT_STREQ(it0->c_str(), "banane");
+
+		// pre-inc
+		EXPECT_STREQ((--it1)->c_str(), "orange");
+		++it1;
+		EXPECT_STREQ((it1--)->c_str(), "banane");
+		EXPECT_STREQ(it1->c_str(), "orange");
+
+		EXPECT_TRUE(++it1 > --it0);
+		EXPECT_FALSE(it1 < it0);
+		EXPECT_TRUE(--it0copy <= it0);
+		EXPECT_TRUE(it0copy >= it0);
 	}
 
 	//		To create a fixture:
