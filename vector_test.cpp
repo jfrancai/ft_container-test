@@ -264,19 +264,16 @@ namespace {
 	{
 		ft::vector< std::string > fruits;
 
-		/*
 		fruits.push_back("orange");
 		fruits.push_back("banane");
 		fruits.push_back("pineapple");
 		fruits.push_back("mango");
 		fruits.push_back("cherry");
 		fruits.push_back("apple");
-		*/
 
 		// Default construct
 		ft::vector< std::string >::const_iterator it0(fruits.begin());
 		EXPECT_STREQ((*it0).c_str(), "orange");
-		/*
 
 		// Copy construct
 		ft::vector< std::string >::const_iterator it1(it0);
@@ -361,8 +358,6 @@ namespace {
 		//operator[]
 		EXPECT_STREQ(it0[1].c_str(), "cherry");
 		EXPECT_STREQ(it0[-1].c_str(), "pineapple");
-		*/
-
 	}
 
 	TEST(VectorBasicTest, LegacyRandomAccessIterator)
