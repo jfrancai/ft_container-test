@@ -260,7 +260,112 @@ namespace {
 		EXPECT_EQ(watcher.getTimesDestr(), (0));
 	}
 
-	TEST(VectorBasicTest, Iterator)
+	TEST(VectorBasicTest, ConstLegacyRandomAccessIterator)
+	{
+		ft::vector< std::string > fruits;
+
+		/*
+		fruits.push_back("orange");
+		fruits.push_back("banane");
+		fruits.push_back("pineapple");
+		fruits.push_back("mango");
+		fruits.push_back("cherry");
+		fruits.push_back("apple");
+		*/
+
+		// Default construct
+		ft::vector< std::string >::const_iterator it0(fruits.begin());
+		EXPECT_STREQ((*it0).c_str(), "orange");
+		/*
+
+		// Copy construct
+		ft::vector< std::string >::const_iterator it1(it0);
+		EXPECT_STREQ((*it1).c_str(), "orange");
+
+		// Equality comparable
+		EXPECT_TRUE(it0 == it1);
+		// Inequality comparable
+		EXPECT_FALSE(it0 != it1);
+
+		// Pre-increment
+		++it1;
+		EXPECT_STREQ((*it1).c_str(), "banane");
+
+		EXPECT_FALSE(it0 == it1);
+		EXPECT_TRUE(it0 != it1);
+
+		// Swappable
+		std::swap(it0, it1);
+
+		EXPECT_STREQ((*it1).c_str(), "orange");
+		EXPECT_STREQ((*it0).c_str(), "banane");
+
+		// operator->
+		EXPECT_STREQ(it1->c_str(), "orange");
+		EXPECT_STREQ(it0->c_str(), "banane");
+
+		// Post-inc
+		EXPECT_STREQ((it1++)->c_str(), "orange");
+		EXPECT_STREQ(it1->c_str(), "banane");
+		it0 = fruits.begin();
+		EXPECT_STREQ((*it0++).c_str(), "orange");
+
+		it0 = fruits.begin();
+		ft::vector< std::string >::const_iterator it0copy(it0);
+		it0copy++;
+		EXPECT_STREQ(it0->c_str(), "orange");
+		EXPECT_STREQ(it0copy->c_str(), "banane");
+
+		it0copy = it0;
+		EXPECT_TRUE(++it0 == ++it0copy);
+		EXPECT_STREQ(it0copy->c_str(), "banane");
+		EXPECT_STREQ(it0->c_str(), "banane");
+
+		// Pre-inc
+		EXPECT_STREQ((--it1)->c_str(), "orange");
+		++it1;
+		EXPECT_STREQ((it1--)->c_str(), "banane");
+		EXPECT_STREQ(it1->c_str(), "orange");
+
+		// operator>
+		EXPECT_TRUE(++it1 > --it0);
+
+		// operator<
+		EXPECT_FALSE(it1 < it0);
+
+		// operator<=
+		EXPECT_TRUE(--it0copy <= it0);
+
+		// operator>=
+		EXPECT_TRUE(it0copy >= it0);
+
+		// operator+=
+		it0 += 3;
+		EXPECT_STREQ(it0->c_str(), "mango");
+
+		// operator+
+		EXPECT_STREQ((it0 + 2)->c_str(), "apple");
+		EXPECT_STREQ((2 + it0)->c_str(), "apple");
+
+		// operator-=
+		it0 -= 1;
+		EXPECT_STREQ(it0->c_str(), "pineapple");
+		it0 -= -1;
+		EXPECT_STREQ(it0->c_str(), "mango");
+
+		// operator-
+		EXPECT_STREQ((it0 - 1)->c_str(), "pineapple");
+		EXPECT_STREQ((it0 - -1)->c_str(), "cherry");
+		EXPECT_EQ((it0 + 5) - it0, std::ptrdiff_t(5));
+
+		//operator[]
+		EXPECT_STREQ(it0[1].c_str(), "cherry");
+		EXPECT_STREQ(it0[-1].c_str(), "pineapple");
+		*/
+
+	}
+
+	TEST(VectorBasicTest, LegacyRandomAccessIterator)
 	{
 		ft::vector< std::string > fruits;
 
@@ -361,7 +466,6 @@ namespace {
 		//operator[]
 		EXPECT_STREQ(it0[1].c_str(), "cherry");
 		EXPECT_STREQ(it0[-1].c_str(), "pineapple");
-
 	}
 
 	//		To create a fixture:
