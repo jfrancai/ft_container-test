@@ -359,6 +359,17 @@ namespace {
 		//operator[]
 		EXPECT_STREQ(it0[1].c_str(), "cherry");
 		EXPECT_STREQ(it0[-1].c_str(), "pineapple");
+
+		ft::vector<int> vect;
+		vect.push_back(42);
+		vect.push_back(43);
+
+		ft::vector<int>::iterator ite(vect.begin());
+		*ite = *(ite + 1);
+
+		EXPECT_EQ(*ite, 43);
+
+
 	}
 */
 
@@ -525,6 +536,15 @@ namespace {
 		EXPECT_FALSE(it1 < it0);
 		EXPECT_TRUE(--it0copy <= it0);
 		EXPECT_TRUE(it0copy >= it0);
+		ft::vector<int> vect;
+		vect.push_back(42);
+		vect.push_back(43);
+
+		ft::vector<int>::iterator ite(vect.begin());
+		*ite = *(ite + 1);
+
+		EXPECT_EQ(*ite, 43);
+
 	}
 
 	//		To create a fixture:
@@ -593,9 +613,163 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, TestSwap)
+	{
+		ft::vector< TypeParam >	tmp1(this->v1_);
+		ft::vector< TypeParam >	tmp2(this->v2_);
+
+		this->v2_.swap(this->v1_);
+
+		EXPECT_TRUE(tmp1.size() == this->v2_.size());
+		EXPECT_TRUE(tmp1.capacity() == this->v2_.capacity());
+		EXPECT_TRUE(tmp1.get_allocator() == this->v2_.get_allocator());
+
+		typename ft::vector< TypeParam >::iterator it_tmp1(tmp1.begin());
+		typename ft::vector< TypeParam >::iterator it_v2(this->v2_.begin());
+
+		while (it_tmp1 != tmp1.end() && it_v2 != this->v2_.end())
+		{
+			EXPECT_TRUE(*it_tmp1 == *it_v2);
+			++it_tmp1;
+			++it_v2;
+		}
+
+		typename ft::vector< TypeParam >::iterator it_tmp2(tmp2.begin());
+		typename ft::vector< TypeParam >::iterator it_v1(this->v1_.begin());
+
+		while (it_tmp2 != tmp2.end() && it_v1 != this->v1_.end())
+		{
+			EXPECT_TRUE(*it_tmp2 == *it_v1);
+			++it_tmp2;
+			++it_v1;
+		}
+
+		EXPECT_TRUE(tmp2.size() == this->v1_.size());
+		EXPECT_TRUE(tmp2.capacity() == this->v1_.capacity());
+		EXPECT_TRUE(tmp2.get_allocator() == this->v1_.get_allocator());
+	}
+
+	TYPED_TEST(VectorTest, TestResize)
+	{
+		typedef WrapAllocator< TypeParam >				WrapAlloc;
+		typedef ft::vector< TypeParam, WrapAlloc >		wVector;
+
+		this->v2_.resize(42);
+		EXPECT_EQ(this->v2_.size(), 42);
+
+		{
+			// Test set up
+			WrapAlloc wAlloc(this->watcher);
+			wVector	wVect(wAlloc);
+			for (TypeParam i = 0; i < 5; i++)
+				wVect.push_back(i + 1);
+
+			// Watch
+			this->watcher.watch();
+			wVect.resize(3);
+			this->watcher.stopwatch();
+
+			// endWatch
+			EXPECT_EQ(this->watcher.getTimesAlloc(), (0));
+			EXPECT_EQ(this->watcher.getTimesDealloc(), (0));
+			EXPECT_EQ(this->watcher.getTimesDestr(), (2));
+			EXPECT_EQ(this->watcher.getTimesConstr(), (0));
+			EXPECT_EQ(wVect.size(), size_t(3));
+			EXPECT_EQ(wVect.capacity(), size_t(8));
+		}
+
+		{
+			// Test set up
+			WrapAllocatorWatcher	watcher;
+			WrapAlloc wAlloc(watcher);
+			wVector	wVect(wAlloc);
+			for (TypeParam i = 0; i < 5; i++)
+				wVect.push_back(i + 1);
+
+			// Watch
+			watcher.watch();
+			wVect.resize(42);
+			watcher.stopwatch();
+
+			// endWatch
+			EXPECT_EQ(watcher.getTimesAlloc(), (1));
+			EXPECT_EQ(watcher.getTimesDealloc(), (1));
+			EXPECT_EQ(watcher.getTimesDestr(), (5));
+			EXPECT_EQ(watcher.getTimesConstr(), (42));
+			EXPECT_EQ(wVect.size(), size_t(42));
+		}
+
+		{
+			// Test set up
+			WrapAllocatorWatcher	watcher;
+			WrapAlloc wAlloc(watcher);
+			wVector	wVect(wAlloc);
+			for (TypeParam i = 0; i < 5; i++)
+				wVect.push_back(i + 1);
+
+			// Watch
+			watcher.watch();
+			wVect.resize(42, 1);
+			watcher.stopwatch();
+
+			// endWatch
+			EXPECT_EQ(watcher.getTimesAlloc(), (1));
+			EXPECT_EQ(watcher.getTimesDealloc(), (1));
+			EXPECT_EQ(watcher.getTimesDestr(), (5));
+			EXPECT_EQ(watcher.getTimesConstr(), (42));
+			for (TypeParam i = 0; i < 5; i++)
+				EXPECT_EQ(wVect[i], i + 1);
+			for (TypeParam i = 5; i < 42; i++)
+				EXPECT_EQ(wVect[i], 1);
+			EXPECT_EQ(wVect.size(), size_t(42));
+		}
+	}
+
+	TYPED_TEST(VectorTest, TestEraseFirstLast)
+	{
+		typename ft::vector< TypeParam >::iterator ite(this->v2_.erase(this->v2_.begin() + 1, this->v2_.end()));
+		EXPECT_EQ(ite[-1], 1);
+		EXPECT_EQ(ite[0], 2);
+		EXPECT_EQ(this->v2_.size(), 1);
+		EXPECT_TRUE(ite == this->v2_.end());
+		ite  = this->v2_.erase(this->v2_.end(), this->v2_.end());
+		EXPECT_EQ(ite[-1], 1);
+		EXPECT_EQ(ite[0], 2);
+		EXPECT_EQ(this->v2_.size(), 1);
+		EXPECT_TRUE(ite == this->v2_.end());
+	}
+
+	TYPED_TEST(VectorTest,TestErasePos)
+	{
+		typename ft::vector< TypeParam >::iterator ite(this->v2_.erase(this->v2_.end() - 3));
+		EXPECT_EQ(*ite, 6);
+		EXPECT_EQ(this->v2_.size(), 6);
+		ite = this->v2_.erase(this->v2_.end() - 1);
+		EXPECT_TRUE(ite == this->v2_.end());
+		EXPECT_EQ(this->v2_.size(), 5);
+	}
+
+	TYPED_TEST(VectorTest, TestClear)
+	{
+		std::size_t	oldCapacity = this->v2_.capacity();
+		this->v2_.clear();	
+		EXPECT_EQ(this->v2_.size(), 0);
+		EXPECT_EQ(this->v2_.capacity(), oldCapacity);
+		EXPECT_TRUE(this->v2_.begin() == this->v2_.end());
+	}
+
+	TYPED_TEST(VectorTest, TestEnd)
+	{
+		EXPECT_TRUE(this->v0_.begin() == this->v0_.end());
+		this->v0_.push_back(42);
+		EXPECT_TRUE(this->v0_.begin() != this->v0_.end());
+		EXPECT_EQ(*(this->v0_.end() - 1), 42);
+		EXPECT_EQ(*(this->v2_.end() - 1), 7);
+	}
 
 	TYPED_TEST(VectorTest, TestBegin)
 	{
+		EXPECT_EQ(*this->v2_.begin(), 1);
 	}
 
 	TYPED_TEST(VectorTest, TestCountConstructor)
@@ -1222,6 +1396,20 @@ namespace {
 					throw;
 				}
 			}, std::length_error);
+			// Calling resize with new_size > max_size
+			EXPECT_THROW({
+				try
+				{
+					myLocalVect.resize(-1);
+				}
+				catch (const std::exception &e)
+				{
+					EXPECT_STREQ("vector::resize", e.what());
+					throw;
+				}
+			}, std::length_error);
+
+
 		}
 	}
 
