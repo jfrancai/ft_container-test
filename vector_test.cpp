@@ -550,6 +550,42 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, TestSwap)
+	{
+		ft::vector< TypeParam >	tmp1(this->v1_);
+		ft::vector< TypeParam >	tmp2(this->v2_);
+
+		this->v2_.swap(this->v1_);
+
+		EXPECT_TRUE(tmp1.size() == this->v2_.size());
+		EXPECT_TRUE(tmp1.capacity() == this->v2_.capacity());
+		EXPECT_TRUE(tmp1.get_allocator() == this->v2_.get_allocator());
+
+		typename ft::vector< TypeParam >::iterator it_tmp1(tmp1.begin());
+		typename ft::vector< TypeParam >::iterator it_v2(this->v2_.begin());
+
+		while (it_tmp1 != tmp1.end() && it_v2 != this->v2_.end())
+		{
+			EXPECT_TRUE(*it_tmp1 == *it_v2);
+			++it_tmp1;
+			++it_v2;
+		}
+
+		typename ft::vector< TypeParam >::iterator it_tmp2(tmp2.begin());
+		typename ft::vector< TypeParam >::iterator it_v1(this->v1_.begin());
+
+		while (it_tmp2 != tmp2.end() && it_v1 != this->v1_.end())
+		{
+			EXPECT_TRUE(*it_tmp2 == *it_v1);
+			++it_tmp2;
+			++it_v1;
+		}
+
+		EXPECT_TRUE(tmp2.size() == this->v1_.size());
+		EXPECT_TRUE(tmp2.capacity() == this->v1_.capacity());
+		EXPECT_TRUE(tmp2.get_allocator() == this->v1_.get_allocator());
+	}
+
 	TYPED_TEST(VectorTest, TestResize)
 	{
 		typedef WrapAllocator< TypeParam >				WrapAlloc;
