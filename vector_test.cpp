@@ -550,6 +550,34 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, ReverseIteratorTest)
+	{
+		ft::reverse_iterator< typename ft::vector< TypeParam >::iterator >	rev_it_0(this->v2_.begin() + 1);
+		ft::reverse_iterator< typename ft::vector< TypeParam >::iterator >	rev_it_1(rev_it_0);
+		rev_it_0 = rev_it_1;
+		EXPECT_TRUE(*rev_it_0 == *this->v2_.begin());
+		EXPECT_TRUE(*rev_it_0 == *this->v2_.begin());
+		rev_it_1 = ft::reverse_iterator< typename ft::vector< TypeParam >::iterator > (this->v2_.end());
+		EXPECT_EQ(rev_it_0[-1], 2);
+		EXPECT_EQ(rev_it_1[0], 7);
+		EXPECT_TRUE(rev_it_0 != rev_it_1);
+		EXPECT_FALSE(rev_it_0 == rev_it_1);
+		EXPECT_FALSE(rev_it_0 <= rev_it_1);
+		EXPECT_TRUE(rev_it_0 >= rev_it_1);
+		rev_it_1 += 2;
+		EXPECT_EQ(rev_it_1[0], 5);
+		rev_it_1 -= 1;
+		EXPECT_EQ(rev_it_1[0], 6);
+		EXPECT_EQ((--rev_it_1)[0], 7);
+		EXPECT_EQ((++rev_it_1)[0], 6);
+		EXPECT_EQ((rev_it_1++)[0], 6);
+		EXPECT_EQ((rev_it_1--)[0], 5);
+		EXPECT_EQ(rev_it_1[0], 6);
+		EXPECT_EQ(*(rev_it_1 + 1), 5);
+		EXPECT_EQ(*(1 + rev_it_1), 5);
+		EXPECT_EQ(*(rev_it_1 - 1), 7);
+	}
+
 	TYPED_TEST(VectorTest, TestSwap)
 	{
 		ft::vector< TypeParam >	tmp1(this->v1_);
@@ -1397,6 +1425,12 @@ namespace {
 
 	typedef testing::Types< std::string > StringTypes;
 	TYPED_TEST_CASE(VectorTestString, StringTypes);
+
+	TYPED_TEST(VectorTestString, TestReverIterator)
+	{
+		ft::reverse_iterator< typename ft::vector< TypeParam >::iterator >	rev_it_0(this->v5_.begin() + 1);
+		EXPECT_TRUE(rev_it_0->c_str() == (this->v5_.begin())->c_str());
+	}
 
 	TYPED_TEST(VectorTestString, TestStringDefaultConstructor)
 	{
