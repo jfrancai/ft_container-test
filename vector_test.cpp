@@ -611,6 +611,13 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, InsertTest)
+	{
+		typename ft::vector< TypeParam >::iterator	it = this->v2_.begin();
+		it = this->v2_.insert(it, 42);
+		EXPECT_EQ(*this->v2_.begin(), 42);
+	}
+
 	TYPED_TEST(VectorTest, ReverseIteratorTest)
 	{
 		ft::reverse_iterator< typename ft::vector< TypeParam >::iterator >	rev_it_0(this->v2_.begin() + 1);
