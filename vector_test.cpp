@@ -611,6 +611,73 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, NonMemberFunction)
+	{
+		ft::vector< TypeParam > bob;
+		ft::vector< TypeParam > alice;
+
+		bob.push_back(1);
+
+		EXPECT_TRUE(alice < bob);
+		EXPECT_FALSE(bob < alice);
+
+		EXPECT_FALSE(alice > bob);
+		EXPECT_TRUE(bob > alice);
+
+		EXPECT_FALSE(alice >= bob);
+		EXPECT_TRUE(bob >= alice);
+
+		EXPECT_TRUE(alice <= bob);
+		EXPECT_FALSE(bob <= alice);
+
+		EXPECT_FALSE(alice == bob);
+		EXPECT_FALSE(bob == alice);
+
+		EXPECT_TRUE(alice != bob);
+		EXPECT_TRUE(bob != alice);
+
+		alice.push_back(0);
+
+		EXPECT_TRUE(alice < bob);
+		EXPECT_FALSE(bob < alice);
+
+		EXPECT_FALSE(alice > bob);
+		EXPECT_TRUE(bob > alice);
+
+		EXPECT_FALSE(alice >= bob);
+		EXPECT_TRUE(bob >= alice);
+
+		EXPECT_TRUE(alice <= bob);
+		EXPECT_FALSE(bob <= alice);
+
+		EXPECT_FALSE(alice == bob);
+		EXPECT_FALSE(bob == alice);
+
+		EXPECT_TRUE(alice != bob);
+		EXPECT_TRUE(bob != alice);
+
+		alice[0] = 1;
+		bob[0] = 1;
+
+		EXPECT_FALSE(alice < bob);
+		EXPECT_FALSE(bob < alice);
+
+		EXPECT_FALSE(alice > bob);
+		EXPECT_FALSE(bob > alice);
+
+		EXPECT_TRUE(alice >= bob);
+		EXPECT_TRUE(bob >= alice);
+
+		EXPECT_TRUE(alice <= bob);
+		EXPECT_TRUE(bob <= alice);
+
+		EXPECT_TRUE(alice == bob);
+		EXPECT_TRUE(bob == alice);
+
+		EXPECT_FALSE(alice != bob);
+		EXPECT_FALSE(bob != alice);
+	}
+
 	TYPED_TEST(VectorTest, InsertTest1)
 	{
 		std::vector< TypeParam > vect;
@@ -619,11 +686,6 @@ namespace {
 		this->v2_.insert(this->v2_.begin() + 3, this->v2_.begin(), this->v2_.begin() + 2);
 		typename ft::vector< TypeParam >::iterator begin = this->v2_.begin();
 		EXPECT_EQ(this->v2_.size(), 9);
-		/*
-		vect.insert(vect.begin() + 3, vect.begin(), vect.begin() + 2);
-		typename std::vector< TypeParam >::iterator begin = vect.begin();
-		EXPECT_EQ(vect.size(), 9);
-		*/
 
 		EXPECT_EQ(begin[0], 1);
 		EXPECT_EQ(begin[1], 2);
