@@ -611,11 +611,55 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
-	TYPED_TEST(VectorTest, InsertTest)
+	TYPED_TEST(VectorTest, InsertTest1)
 	{
-		typename ft::vector< TypeParam >::iterator	it = this->v2_.begin();
+		std::vector< TypeParam > vect;
+		for (TypeParam i = 0; i < 7; ++i)
+			vect.push_back(i + 1);
+		this->v2_.insert(this->v2_.begin() + 3, this->v2_.begin(), this->v2_.begin() + 2);
+		typename ft::vector< TypeParam >::iterator begin = this->v2_.begin();
+		EXPECT_EQ(this->v2_.size(), 9);
+		/*
+		vect.insert(vect.begin() + 3, vect.begin(), vect.begin() + 2);
+		typename std::vector< TypeParam >::iterator begin = vect.begin();
+		EXPECT_EQ(vect.size(), 9);
+		*/
+
+		EXPECT_EQ(begin[0], 1);
+		EXPECT_EQ(begin[1], 2);
+		EXPECT_EQ(begin[2], 3);
+		EXPECT_EQ(begin[3], 1);
+		EXPECT_EQ(begin[4], 2);
+		EXPECT_EQ(begin[5], 4);
+		EXPECT_EQ(begin[6], 5);
+		EXPECT_EQ(begin[7], 6);
+		EXPECT_EQ(begin[8], 7);
+	}
+
+	TYPED_TEST(VectorTest, DISABLED_InsertTest0)
+	{
+		typename ft::vector< TypeParam >::iterator	it(this->v2_.begin());
 		it = this->v2_.insert(it, 42);
 		EXPECT_EQ(*this->v2_.begin(), 42);
+		EXPECT_EQ(this->v2_.size(), 8);
+		EXPECT_EQ(this->v2_.capacity(), 8);
+
+		it = this->v1_.end();
+		it = this->v1_.insert(it, 43);
+		EXPECT_EQ(*(this->v1_.end() - 1), 43);
+		EXPECT_EQ(*it, 43);
+		EXPECT_EQ(this->v1_.size(), 2);
+
+		it = this->v0_.begin();
+		this->v0_.insert(it, size_t(0), 42);
+		EXPECT_EQ(this->v0_.size(), 0);
+		EXPECT_EQ(this->v0_.capacity(), 0);
+		this->v0_.insert(it, size_t(42), 1);
+		EXPECT_EQ(this->v0_.size(), 42);
+		EXPECT_EQ(this->v0_.capacity(), 42);
+		this->v0_.insert(it, size_t(1), 1);
+		EXPECT_EQ(this->v0_.size(), 43);
+		EXPECT_EQ(this->v0_.capacity(), 84);
 	}
 
 	TYPED_TEST(VectorTest, ReverseIteratorTest)
