@@ -709,28 +709,30 @@ namespace {
 		EXPECT_EQ(begin[8], 7);
 	}
 
-	TYPED_TEST(VectorTest, DISABLED_InsertTest0)
+	TYPED_TEST(VectorTest, InsertTest0)
 	{
-		typename ft::vector< TypeParam >::iterator	it(this->v2_.begin());
-		it = this->v2_.insert(it, 42);
+		typename ft::vector< TypeParam >::iterator it( this->v2_.insert(this->v2_.begin(), 42) );
 		EXPECT_EQ(*this->v2_.begin(), 42);
+		EXPECT_EQ(*it, 42);
 		EXPECT_EQ(this->v2_.size(), 8);
 		EXPECT_EQ(this->v2_.capacity(), 8);
 
-		it = this->v1_.end();
-		it = this->v1_.insert(it, 43);
+		it = this->v1_.insert(this->v1_.end(), 43);
 		EXPECT_EQ(*(this->v1_.end() - 1), 43);
 		EXPECT_EQ(*it, 43);
 		EXPECT_EQ(this->v1_.size(), 2);
 
-		it = this->v0_.begin();
-		this->v0_.insert(it, size_t(0), 42);
+		this->v0_.insert(this->v0_.begin(), size_t(0), 42);
 		EXPECT_EQ(this->v0_.size(), 0);
 		EXPECT_EQ(this->v0_.capacity(), 0);
-		this->v0_.insert(it, size_t(42), 1);
-		EXPECT_EQ(this->v0_.size(), 42);
+
+		this->v0_.insert(this->v0_.begin(), size_t(42), 1);
+		for (typename ft::vector < TypeParam >::iterator i = this->v0_.begin(); i != this->v0_.end(); ++i)
+			EXPECT_EQ(*i, 1);
 		EXPECT_EQ(this->v0_.capacity(), 42);
-		this->v0_.insert(it, size_t(1), 1);
+
+		this->v0_.insert(this->v0_.end(), size_t(1), 42);
+		EXPECT_EQ(*(this->v0_.end() - 1), 42);
 		EXPECT_EQ(this->v0_.size(), 43);
 		EXPECT_EQ(this->v0_.capacity(), 84);
 	}
