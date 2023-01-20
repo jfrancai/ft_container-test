@@ -611,6 +611,17 @@ namespace {
 #endif
 	TYPED_TEST_CASE(VectorTest, MyTypes);
 
+	TYPED_TEST(VectorTest, NonMemberSwap)
+	{
+		ft::vector< TypeParam > tmp1(this->v1_);
+		ft::vector< TypeParam > tmp2(this->v2_);
+
+		ft::swap(this->v1_, this->v2_);
+
+		EXPECT_TRUE(this->v1_ == tmp2);
+		EXPECT_TRUE(this->v2_ == tmp1);
+	}
+
 	TYPED_TEST(VectorTest, NonMemberFunction)
 	{
 		ft::vector< TypeParam > bob;
