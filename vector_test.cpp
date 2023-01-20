@@ -908,18 +908,21 @@ namespace {
 		EXPECT_TRUE(this->v2_.begin() == this->v2_.end());
 	}
 
-	TYPED_TEST(VectorTest, TestEnd)
+	TYPED_TEST(VectorTest, TestIterators)
 	{
-		EXPECT_TRUE(this->v0_.begin() == this->v0_.end());
-		this->v0_.push_back(42);
-		EXPECT_TRUE(this->v0_.begin() != this->v0_.end());
-		EXPECT_EQ(*(this->v0_.end() - 1), 42);
-		EXPECT_EQ(*(this->v2_.end() - 1), 7);
-	}
+		const	ft::vector< TypeParam > const_vect (this->v2_);
 
-	TYPED_TEST(VectorTest, TestBegin)
-	{
+		// Non-const
 		EXPECT_EQ(*this->v2_.begin(), 1);
+		EXPECT_EQ(*(this->v2_.end() - 1), 7);
+		EXPECT_EQ(*this->v2_.rbegin(), 7);
+		EXPECT_EQ(*(this->v2_.rend() - 1), 1);
+
+		// Const
+		EXPECT_EQ(*const_vect.begin(), 1);
+		EXPECT_EQ(*(const_vect.end() - 1), 7);
+		EXPECT_EQ(*const_vect.rbegin(), 7);
+		EXPECT_EQ(*(const_vect.rend() - 1), 1);
 	}
 
 	TYPED_TEST(VectorTest, TestCountConstructor)
