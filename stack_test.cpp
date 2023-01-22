@@ -1,5 +1,5 @@
 #include <iostream>
-#include <ft/stack.hpp>
+#include <stack.hpp>
 #include <gtest/gtest.h>
 #include <stack>
 #include <list>
