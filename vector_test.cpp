@@ -1,81 +1,14 @@
+#include <algorithm>
+#include <gtest/gtest.h>
+#include <vector.hpp>
+
 /*
+ * [ google test v1.8.1 in use for compatibility reasons ]
+ *
  * Usefull links :
  * Reference Testing	: https://google.github.io/googletest/reference/testing.html
  * Reference Assertions : https://google.github.io/googletest/reference/assertions.html
- *
- * [ google test v1.8.1 in use for compatibility reasons ]
  */
-
-/*	
- *	Test-driven development cycle
- *	
- *
- * 1.	Add a test
- *
- * 		The adding of a new feature begins by writing a test that passes if the feature's specifications are met.
- * 		The developer can discover these specifications by asking about use cases and user stories.
- * 		A key benefit of test-driven development is that it makes the developer focus on requirements before writing code.
- * 		This is in contrast with the usual practice, where unit tests are only written after code.
- *
- *
- * 2.	Run all tests.
- *
- * 		The new test should fail for expected reasons
- * 		This shows that new code is actually needed for the desired feature.
- * 		It validates that the test harness is working correctly.
- * 		It rules out the possibility that the new test is flawed and will always pass.
- *
- *
- * 3.	Write the simplest code that passes the new test
- *
- *		Inelegant or hard code is acceptable, as long as it passes the test.
- *		The code will be honed anyway in Step 5.
- *		No code should be added beyond the tested functionality.
- *
- *
- * 4.	All tests should now pass
- *
- *		If any fail, the new code must be revised until they pass.
- *		This ensures the new code meets the test requirements and does not break existing features.
- *
- *
- * 5.	Refactor as needed, using tests after each refactor to ensure that functionality is preserved
- *
- *		Code is refactored for readability and maintainability.
- *		In particular, hard-coded test data should be removed.
- *		Running the test suite after each refactor helps ensure that no existing functionality is broken.
- *
- *
- * 6.	Repeat
- *
- *		The cycle above is repeated for each new piece of functionality.
- *		Tests should be small and incremental, and commits made often.
- *		That way, if new code fails some tests, the programmer can simply undo or revert rather than debug excessively.
- */
-
-/*
- * TODO_LIST
- *
- * Constructors
- *
- * 	1)	vector(); ok
- * 	2)	vector( const vector& other ); ok
- * 	3)	explicit vector( const Allocator& alloc ); ok
- * 	4)	explicit vector( size_type count, const T& value = T(), const Allocator& alloc = Allocator()); ok
- * 	5)	template< class InputIt > vector( InputIt first, InputIt last, const Allocator& alloc = Allocator() );
- *
- * Destructors
- *
- */
-
-
-#include <algorithm>
-// Testing Library
-#include <gtest/gtest.h>
-// Mocking Library
-//#include "gmock/gmock.h"
-// The tested Library
-#include <ft/vector.hpp>
 
 namespace {
 
@@ -292,7 +225,7 @@ namespace {
 		EXPECT_TRUE(it0 != it1);
 
 		// Swappable
-		std::swap(it0, it1);
+		ft::swap(it0, it1);
 
 		EXPECT_STREQ((*it1).c_str(), "orange");
 		EXPECT_STREQ((*it0).c_str(), "banane");
@@ -406,7 +339,7 @@ namespace {
 		EXPECT_TRUE(it0 != it1);
 
 		// Swappable
-		std::swap(it0, it1);
+		ft::swap(it0, it1);
 
 		EXPECT_STREQ((*it1).c_str(), "orange");
 		EXPECT_STREQ((*it0).c_str(), "banane");
@@ -498,7 +431,7 @@ namespace {
 		EXPECT_TRUE(it2 != it3);
 
 		// Swappable
-		std::swap(it2, it3);
+		ft::swap(it2, it3);
 
 		EXPECT_STREQ((*it3).c_str(), "orange");
 		EXPECT_STREQ((*it2).c_str(), "banane");
