@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <vector.hpp>
+#include <list>
 
 /*
  * [ google test v1.8.1 in use for compatibility reasons ]
@@ -96,6 +97,35 @@ namespace {
 		}
 	}
 
+	TEST(VectorBasicTest, IteratorConstructor)
+	{
+		ft::vector< int > vec;
+		vec.push_back(1);
+		vec.push_back(2);
+		vec.push_back(3);
+
+		ft::vector< int > myVec(vec.begin(), vec.end());
+		std::vector< int > stdVec(vec.begin(), vec.end());
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_EQ(myVec.front(), stdVec.front());
+		EXPECT_EQ(myVec.back(), stdVec.back());
+		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
+		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
+		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
+		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
+
+		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
+		{
+			EXPECT_EQ(myVec[i], stdVec[i]);
+			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		}
+	}
+
 	TEST(VectorBasicTest, AssignMethod1)
 	{
 		{
@@ -112,8 +142,8 @@ namespace {
 			ft::vector< int > myVecCopy;
 			std::vector< int > stdVecCopy;
 
-			myVecCopy.assign(std::size_t(0), 42);
-			stdVecCopy.assign(std::size_t(0), 42);
+			myVecCopy.assign(0, 42);
+			stdVecCopy.assign(0, 42);
 
 			EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
 			EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
@@ -142,8 +172,8 @@ namespace {
 			ft::vector< int > myVecCopy;
 			std::vector< int > stdVecCopy;
 
-			myVecCopy.assign(std::size_t(10), 42);
-			stdVecCopy.assign(std::size_t(10), 42);
+			myVecCopy.assign(10, 42);
+			stdVecCopy.assign(10, 42);
 
 			EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
 			EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
@@ -184,8 +214,8 @@ namespace {
 			ft::vector< int > myVecCopy;
 			std::vector< int > stdVecCopy;
 
-			myVecCopy.assign(std::size_t(10), 42);
-			stdVecCopy.assign(std::size_t(10), 42);
+			myVecCopy.assign(10, 42);
+			stdVecCopy.assign(10, 42);
 
 			EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
 			EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
@@ -329,6 +359,347 @@ namespace {
 		{
 			EXPECT_EQ(myVecCopy[i], stdVecCopy[i]);
 			EXPECT_EQ(myVecCopy.at(i), stdVecCopy.at(i));
+		}
+	}
+	
+	TEST(VectorBasicTest, ReserveMethod)
+	{
+		ft::vector< int > myVec;
+		std::vector< int > stdVec;
+
+		myVec.reserve(10);
+		stdVec.reserve(10);
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+
+
+		for (int i = 0; i < 15; i++)
+		{
+			myVec.push_back(i);
+			stdVec.push_back(i);
+		}
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_EQ(myVec.front(), stdVec.front());
+		EXPECT_EQ(myVec.back(), stdVec.back());
+		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
+		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
+		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
+		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+
+		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
+		{
+			EXPECT_EQ(myVec[i], stdVec[i]);
+			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		}
+	}
+
+	TEST(VectorBasicTest, ClearMethod)
+	{
+		ft::vector< int > myVec;
+		myVec.push_back(1);
+		myVec.push_back(2);
+		myVec.push_back(3);
+
+		std::vector< int > stdVec;
+		stdVec.push_back(1);
+		stdVec.push_back(2);
+		stdVec.push_back(3);
+
+		myVec.clear();
+		stdVec.clear();
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+	}
+
+	TEST(VectorBasicTest, InsertMethod1)
+	{
+		ft::vector< int > myVec;
+		myVec.push_back(1);
+		myVec.push_back(2);
+		myVec.push_back(3);
+
+		std::vector< int > stdVec;
+		stdVec.push_back(1);
+		stdVec.push_back(2);
+		stdVec.push_back(3);
+
+		myVec.insert(myVec.begin() + 1, 42);
+		stdVec.insert(stdVec.begin() + 1, 42);
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_EQ(myVec.front(), stdVec.front());
+		EXPECT_EQ(myVec.back(), stdVec.back());
+		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
+		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
+		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
+		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+
+		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
+		{
+			EXPECT_EQ(myVec[i], stdVec[i]);
+			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		}
+	}
+
+	TEST(VectorBasicTest, InsertMethod2_0)
+	{
+		ft::vector< int > myVec;
+		myVec.push_back(1);
+		myVec.push_back(2);
+		myVec.push_back(3);
+
+		std::vector< int > stdVec;
+		stdVec.push_back(1);
+		stdVec.push_back(2);
+		stdVec.push_back(3);
+
+		myVec.insert(myVec.begin() + 1, 2, 10);
+		stdVec.insert(stdVec.begin() + 1, 2, 10);
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_EQ(myVec.front(), stdVec.front());
+		EXPECT_EQ(myVec.back(), stdVec.back());
+		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
+		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
+		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
+		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+
+		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
+		{
+			EXPECT_EQ(myVec[i], stdVec[i]);
+			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		}
+	}
+
+	TEST(VectorBasicTest, InsertMethod3)
+	{
+		ft::vector< int > myVec;
+		myVec.push_back(1);
+		myVec.push_back(2);
+		myVec.push_back(3);
+		myVec.push_back(4);
+		myVec.push_back(5);
+
+		std::vector< int > stdVec;
+		stdVec.push_back(1);
+		stdVec.push_back(2);
+		stdVec.push_back(3);
+		stdVec.push_back(4);
+		stdVec.push_back(5);
+
+		myVec.insert(myVec.begin() + 1, myVec.begin(), myVec.end());
+		stdVec.insert(stdVec.begin() + 1, stdVec.begin(), stdVec.end());
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_EQ(myVec.front(), stdVec.front());
+		EXPECT_EQ(myVec.back(), stdVec.back());
+		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
+		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
+		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
+		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+
+		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
+		{
+			EXPECT_EQ(myVec[i], stdVec[i]);
+			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		}
+	}
+
+	TEST(VectorBasicTest, PushBackMethod)
+	{
+		ft::vector< int > myVec;
+		for (int i = 0; i < 42; ++i)
+			myVec.push_back(i);
+
+		std::vector< int > stdVec;
+		for (int i = 0; i < 42; ++i)
+			stdVec.push_back(i);
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_EQ(myVec.front(), stdVec.front());
+		EXPECT_EQ(myVec.back(), stdVec.back());
+		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
+		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
+		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
+		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+
+		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
+		{
+			EXPECT_EQ(myVec[i], stdVec[i]);
+			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		}
+	}
+
+	TEST(VectorBasicTest, PopBackMethod)
+	{
+		ft::vector< int > myVec;
+		for (int i = 0; i < 42; ++i)
+			myVec.push_back(i);
+
+		std::vector< int > stdVec;
+		for (int i = 0; i < 42; ++i)
+			stdVec.push_back(i);
+
+		for (int i = 0; i < 21; ++i)
+			myVec.pop_back();
+
+		for (int i = 0; i < 21; ++i)
+			stdVec.pop_back();
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_EQ(myVec.front(), stdVec.front());
+		EXPECT_EQ(myVec.back(), stdVec.back());
+		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
+		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
+		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
+		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+
+		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
+		{
+			EXPECT_EQ(myVec[i], stdVec[i]);
+			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		}
+	}
+
+	TEST(VectorBasicTest, ResizeMethod)
+	{
+		ft::vector< int > myVec;
+
+		std::vector< int > stdVec;
+
+		myVec.resize(23, 42);
+		stdVec.resize(23, 42);
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_EQ(myVec.front(), stdVec.front());
+		EXPECT_EQ(myVec.back(), stdVec.back());
+		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
+		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
+		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
+		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+
+		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
+		{
+			EXPECT_EQ(myVec[i], stdVec[i]);
+			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		}
+
+		myVec.resize(1000);
+		stdVec.resize(1000);
+
+		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
+		EXPECT_TRUE(myVec.empty() == stdVec.empty());
+		EXPECT_EQ(myVec.size(), stdVec.size());
+		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
+		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
+		EXPECT_EQ(myVec.front(), stdVec.front());
+		EXPECT_EQ(myVec.back(), stdVec.back());
+		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
+		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
+		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
+		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
+		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
+		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
+		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
+		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
+		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
+		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+
+		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
+		{
+			EXPECT_EQ(myVec[i], stdVec[i]);
+			EXPECT_EQ(myVec.at(i), stdVec.at(i));
 		}
 	}
 
@@ -779,7 +1150,7 @@ namespace {
 		this->v0_.insert(this->v0_.end(), size_t(1), 42);
 		EXPECT_EQ(*(this->v0_.end() - 1), 42);
 		EXPECT_EQ(this->v0_.size(), 43);
-		EXPECT_EQ(this->v0_.capacity(), 84);
+		EXPECT_EQ(this->v0_.capacity(), 43);
 	}
 
 	TYPED_TEST(VectorTest, ReverseIteratorTest)
@@ -903,22 +1274,22 @@ namespace {
 	TYPED_TEST(VectorTest, TestCountConstructor)
 	{
 		// One param
-		ft::vector< TypeParam > myVect0(0);
+		ft::vector< TypeParam > myVect0(size_t(0));
 		EXPECT_EQ(myVect0.size(), size_t(0));
 		EXPECT_EQ(myVect0.capacity(), size_t(0));
-		ft::vector< TypeParam > myVect1(42);
+		ft::vector< TypeParam > myVect1(size_t(42));
 		EXPECT_EQ(myVect1.size(), size_t(42));
 		EXPECT_EQ(myVect1.capacity(), size_t(42));
 
 		// Two param
-		ft::vector< TypeParam > myVect2(3, 42);
+		ft::vector< TypeParam > myVect2(size_t(3), 42);
 		for (size_t i = 0; i < 3; i++)
 			EXPECT_EQ(myVect2[i], 42);
 		EXPECT_EQ(myVect2.size(), size_t(3));
 		EXPECT_EQ(myVect2.capacity(), size_t(3));
 
 		// Three param
-		ft::vector< TypeParam > myVect3(32, 42, myVect2.get_allocator());
+		ft::vector< TypeParam > myVect3(size_t(32), 42, myVect2.get_allocator());
 		EXPECT_EQ(myVect3.size(), size_t(32));
 		EXPECT_EQ(myVect3.capacity(), size_t(32));
 	}
