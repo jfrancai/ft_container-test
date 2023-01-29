@@ -27,11 +27,9 @@ namespace {
 		ft::RedBlackTree< int >::node_pointer node(rbtree.getRoot());
 
 		EXPECT_FALSE(node->parent);
-		EXPECT_FALSE(node->color);
 		EXPECT_EQ(node->data, 42);
 
 		EXPECT_EQ(node->left->parent, node);
-		EXPECT_TRUE(node->left->color);
 		EXPECT_EQ(node->left->data, 41);
 	}
 
@@ -44,11 +42,9 @@ namespace {
 		ft::RedBlackTree< int >::node_pointer node(rbtree.getRoot());
 
 		EXPECT_FALSE(node->parent);
-		EXPECT_FALSE(node->color);
 		EXPECT_EQ(node->data, 42);
 
 		EXPECT_EQ(node->right->parent, node);
-		EXPECT_TRUE(node->right->color);
 		EXPECT_EQ(node->right->data, 43);
 	}
 
@@ -62,11 +58,9 @@ namespace {
 		ft::RedBlackTree< int >::node_pointer node(rbtree.getRoot());
 
 		EXPECT_FALSE(node->parent);
-		EXPECT_TRUE(node->color);
 		EXPECT_EQ(node->data, 43);
 
 		EXPECT_EQ(node->left->parent, node);
-		EXPECT_FALSE(node->left->color);
 		EXPECT_EQ(node->left->data, 42);
 	}
 
@@ -81,11 +75,116 @@ namespace {
 		ft::RedBlackTree< int >::node_pointer node(rbtree.getRoot());
 
 		EXPECT_FALSE(node->parent);
-		EXPECT_TRUE(node->color);
 		EXPECT_EQ(node->data, 41);
 
 		EXPECT_EQ(node->right->parent, node);
-		EXPECT_FALSE(node->right->color);
 		EXPECT_EQ(node->right->data, 42);
+	}
+
+	TEST(TestRBTree, BasicLeftRightInsertion) {
+		ft::RedBlackTree< int >	rbtree;
+
+		rbtree.insert(42);
+		rbtree.insert(40);
+		rbtree.insert(41);
+
+		ft::RedBlackTree< int >::node_pointer node(rbtree.getRoot());
+
+		EXPECT_FALSE(node->parent);
+		EXPECT_EQ(node->data, 42);
+
+		EXPECT_EQ(node->left->parent, node);
+		EXPECT_EQ(node->left->data, 40);
+
+		EXPECT_EQ(node->left->right->parent, node->left);
+		EXPECT_EQ(node->left->right->data, 41);
+	}
+
+	TEST(TestRBTree, BasicRightLeftInsertion) {
+		ft::RedBlackTree< int >	rbtree;
+
+		rbtree.insert(42);
+		rbtree.insert(44);
+		rbtree.insert(43);
+
+		ft::RedBlackTree< int >::node_pointer node(rbtree.getRoot());
+
+		EXPECT_FALSE(node->parent);
+		EXPECT_EQ(node->data, 42);
+
+		EXPECT_EQ(node->right->parent, node);
+		EXPECT_EQ(node->right->data, 44);
+
+		EXPECT_EQ(node->right->left->parent, node->right);
+		EXPECT_EQ(node->right->left->data, 43);
+	}
+
+	TEST(TestRBTree, BasicLeftRightRotation) {
+		ft::RedBlackTree< int >	rbtree;
+
+		rbtree.insert(42);
+		rbtree.insert(40);
+		rbtree.insert(41);
+
+		ft::RedBlackTree< int >::node_pointer node(rbtree.getRoot());
+
+		ft::RedBlackTree< int >::node_pointer parent(node->parent);
+		ft::RedBlackTree< int >::node_pointer phi(node->right);
+		ft::RedBlackTree< int >::node_pointer alpha(node->left->left);
+		ft::RedBlackTree< int >::node_pointer gama(node->left->right->left);
+		ft::RedBlackTree< int >::node_pointer beta(node->left->right->right);
+
+		rbtree.leftRightRotate(rbtree.getRoot());
+
+		node = rbtree.getRoot();
+
+		EXPECT_FALSE(node->parent);
+		EXPECT_EQ(node->data, 41);
+
+		EXPECT_EQ(node->left->parent, node);
+		EXPECT_EQ(node->left->data, 40);
+
+		EXPECT_EQ(node->right->parent, node);
+		EXPECT_EQ(node->right->data, 42);
+
+		EXPECT_EQ(node->parent, parent);
+		EXPECT_EQ(node->right->right, phi);
+		EXPECT_EQ(node->right->left, gama);
+		EXPECT_EQ(node->left->right, beta);
+		EXPECT_EQ(node->left->left, alpha);
+	}
+
+	TEST(TestRBTree, BasicRightLeftRotation) {
+		ft::RedBlackTree< int >	rbtree;
+
+		rbtree.insert(42);
+		rbtree.insert(44);
+		rbtree.insert(43);
+		ft::RedBlackTree< int >::node_pointer node(rbtree.getRoot());
+
+		ft::RedBlackTree< int >::node_pointer parent(node->parent);
+		ft::RedBlackTree< int >::node_pointer phi(node->left);
+		ft::RedBlackTree< int >::node_pointer alpha(node->right->right);
+		ft::RedBlackTree< int >::node_pointer gama(node->right->left->left);
+		ft::RedBlackTree< int >::node_pointer beta(node->right->left->right);
+
+		rbtree.rightLeftRotate(rbtree.getRoot());
+
+		node = rbtree.getRoot();
+
+		EXPECT_FALSE(node->parent);
+		EXPECT_EQ(node->data, 43);
+
+		EXPECT_EQ(node->left->parent, node);
+		EXPECT_EQ(node->left->data, 42);
+
+		EXPECT_EQ(node->right->parent, node);
+		EXPECT_EQ(node->right->data, 44);
+
+		EXPECT_EQ(node->parent, parent);
+		EXPECT_EQ(node->left->left, phi);
+		EXPECT_EQ(node->left->right, gama);
+		EXPECT_EQ(node->right->left, beta);
+		EXPECT_EQ(node->right->right, alpha);
 	}
 }  // namespace
