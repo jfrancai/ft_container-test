@@ -85,16 +85,22 @@ namespace {
 	{
 		ft::RedBlackTree< int >	rbtree;
 
-		rbtree.insert(61);
-		rbtree.insert(33);
-		rbtree.insert(53);
-		rbtree.insert(11);
-		rbtree.insert(21);
-		rbtree.insert(13);
-		rbtree.insert(31);
-		rbtree.insert(15);
-		rbtree.insert(41);
+		for (int i = 25; i != 0; i--)
+				rbtree.insert(i);
 
+		EXPECT_TRUE(rbtree.checker(rbtree.getRoot()));
+	}
+
+	TEST(TestRBTree, BasicDeletionOfRedNode)
+	{
+		ft::RedBlackTree< int >	rbtree;
+
+		for (int i = 5; i != 0; i--)
+				rbtree.insert(i);
+
+		rbtree.printTree();
+		rbtree.deleteNode(5);
+		rbtree.printTree();
 		EXPECT_TRUE(rbtree.checker(rbtree.getRoot()));
 	}
 
