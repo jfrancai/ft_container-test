@@ -98,10 +98,34 @@ namespace {
 		for (int i = 5; i != 0; i--)
 				rbtree.insert(i);
 
-		rbtree.printTree();
 		rbtree.deleteNode(5);
-		rbtree.printTree();
 		EXPECT_TRUE(rbtree.checker(rbtree.getRoot()));
 	}
 
+	TEST(TestRBTree, CopyConstructor) {
+		ft::RedBlackTree< int >	rbtree;
+
+		for (int i = 5; i != 0; i--)
+				rbtree.insert(i);
+
+		ft::RedBlackTree< int >	rbtree2(rbtree);
+		rbtree2.printTree();
+		rbtree.printTree();
+
+		EXPECT_TRUE(rbtree.checker(rbtree2.getRoot()));
+	}
+
+	TEST(TestRBTree, AssignmentOperator) {
+		ft::RedBlackTree< int >	rbtree;
+
+		for (int i = 5; i != 0; i--)
+				rbtree.insert(i);
+
+		ft::RedBlackTree< int >	rbtree2;
+		rbtree2 = rbtree;
+		rbtree2.printTree();
+		rbtree.printTree();
+
+		EXPECT_TRUE(rbtree.checker(rbtree2.getRoot()));
+	}
 }  // namespace
