@@ -113,6 +113,7 @@ namespace {
 		rbtree.printTree();
 
 		EXPECT_TRUE(rbtree.checker(rbtree2.getRoot()));
+		EXPECT_TRUE(rbtree2 == rbtree);
 	}
 
 	TEST(TestRBTree, AssignmentOperator) {
@@ -127,5 +128,6 @@ namespace {
 		rbtree.printTree();
 
 		EXPECT_TRUE(rbtree.checker(rbtree2.getRoot()));
+		EXPECT_TRUE(rbtree2 == rbtree);
 	}
 }  // namespace
