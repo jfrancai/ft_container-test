@@ -25,6 +25,68 @@ namespace {
 		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
 	}
 
+	TEST(VectorBasicTest, Comparators)
+	{
+		ft::vector< int > v0;
+		ft::vector< int > v1;
+
+		EXPECT_TRUE(v0 == v1);
+		EXPECT_FALSE(v0 != v1);
+		EXPECT_FALSE(v0 < v1);
+		EXPECT_FALSE(v0 > v1);
+		EXPECT_TRUE(v0 >= v1);
+		EXPECT_TRUE(v0 <= v1);
+
+		v0.push_back(42);
+
+		EXPECT_FALSE(v0 == v1);
+		EXPECT_TRUE(v0 != v1);
+		EXPECT_FALSE(v0 < v1);
+		EXPECT_TRUE(v0 > v1);
+		EXPECT_TRUE(v0 >= v1);
+		EXPECT_FALSE(v0 <= v1);
+
+		EXPECT_FALSE(v1 == v0);
+		EXPECT_TRUE(v1 != v0);
+		EXPECT_TRUE(v1 < v0);
+		EXPECT_FALSE(v1 > v0);
+		EXPECT_FALSE(v1 >= v0);
+		EXPECT_TRUE(v1 <= v0);
+
+
+		v1.push_back(42);
+
+		EXPECT_TRUE(v0 == v1);
+		EXPECT_FALSE(v0 != v1);
+		EXPECT_FALSE(v0 < v1);
+		EXPECT_FALSE(v0 > v1);
+		EXPECT_TRUE(v0 >= v1);
+		EXPECT_TRUE(v0 <= v1);
+
+		v0.push_back(43);
+		v1.push_back(42);
+
+		EXPECT_FALSE(v0 == v1);
+		EXPECT_TRUE(v0 != v1);
+		EXPECT_FALSE(v0 < v1);
+		EXPECT_TRUE(v0 > v1);
+		EXPECT_TRUE(v0 >= v1);
+		EXPECT_FALSE(v0 <= v1);
+
+		ft::vector< int > v2;
+		ft::vector< int > v3;
+
+		v2.push_back(42);
+		v3.push_back(43);
+
+		EXPECT_FALSE(v2 == v3);
+		EXPECT_TRUE(v2 != v3);
+		EXPECT_TRUE(v2 < v3);
+		EXPECT_FALSE(v2 > v3);
+		EXPECT_FALSE(v2 >= v3);
+		EXPECT_TRUE(v2 <= v3);
+	}
+
 	TEST(VectorBasicTest, CountConstructor)
 	{
 		ft::vector< int > myVec(42);
@@ -1167,6 +1229,17 @@ namespace {
 		EXPECT_FALSE(rev_it_0 == rev_it_1);
 		EXPECT_FALSE(rev_it_0 <= rev_it_1);
 		EXPECT_TRUE(rev_it_0 >= rev_it_1);
+		EXPECT_FALSE(rev_it_0 < rev_it_1);
+		EXPECT_TRUE(rev_it_0 > rev_it_1);
+
+		rev_it_0 = rev_it_1;
+		EXPECT_FALSE(rev_it_0 != rev_it_1);
+		EXPECT_TRUE(rev_it_0 == rev_it_1);
+		EXPECT_TRUE(rev_it_0 <= rev_it_1);
+		EXPECT_TRUE(rev_it_0 >= rev_it_1);
+		EXPECT_FALSE(rev_it_0 < rev_it_1);
+		EXPECT_FALSE(rev_it_0 > rev_it_1);
+
 		rev_it_1 += 2;
 		EXPECT_EQ(rev_it_1[0], 5);
 		rev_it_1 -= 1;
