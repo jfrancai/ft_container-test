@@ -26,6 +26,8 @@ namespace {
 	TEST(MapBasicTest, InsertMethod1)
 	{
 		ft::map< int, int > myMap;
+		ft::map< int, int > myMap2;
+
 		std::map< int, int > stdMap;
 
 		myMap.insert(std::make_pair(42, 42));
@@ -37,19 +39,24 @@ namespace {
 		myMap.insert(std::make_pair(43, 43));
 		stdMap.insert(std::make_pair(43, 43));
 
+		myMap.insert(std::make_pair(44, 44));
+		stdMap.insert(std::make_pair(44, 44));
+
+		myMap.getTree().printTree();
+
 		EXPECT_TRUE(myMap.get_allocator() == stdMap.get_allocator());
 		EXPECT_TRUE(myMap.empty() == stdMap.empty());
 		EXPECT_EQ(myMap.size(), stdMap.size());
-		//EXPECT_EQ(myMap.max_size(), stdMap.max_size());
+//		EXPECT_EQ(myMap.max_size(), stdMap.max_size());
 		EXPECT_EQ(*myMap.begin(), *stdMap.begin());
-		EXPECT_EQ(*(myMap.end() - 1), *(stdMap.end() - 1));
-		/*
+		EXPECT_EQ(*(--myMap.end()), *(--stdMap.end()));
 		EXPECT_EQ(*myMap.rbegin(), *stdMap.rbegin());
-		EXPECT_EQ(*(myMap.rend() - 1), *(stdMap.rend() - 1));
+		EXPECT_EQ(*(--myMap.rend()), *(--stdMap.rend()));
 		EXPECT_TRUE((myMap == myMap) ==  (stdMap == stdMap));
 		EXPECT_TRUE((myMap != myMap) ==  (stdMap != stdMap));
 		EXPECT_TRUE((myMap < myMap) ==  (stdMap < stdMap));
 		EXPECT_TRUE((myMap <= myMap) ==  (stdMap <= stdMap));
+		/*
 		EXPECT_TRUE((myMap > myMap) ==  (stdMap > stdMap));
 		EXPECT_TRUE((myMap >= myMap) ==  (stdMap >= stdMap));
 
@@ -59,6 +66,68 @@ namespace {
 			EXPECT_EQ(myMap.at(i), stdMap.at(i));
 		}
 		*/
+	}
+
+	TEST(MapBasicTest, Comparators)
+	{
+		ft::map< int, int > m0;
+		ft::map< int, int > m1;
+
+		EXPECT_TRUE(m0 == m1);
+		EXPECT_FALSE(m0 != m1);
+		EXPECT_FALSE(m0 < m1);
+		EXPECT_FALSE(m0 > m1);
+		EXPECT_TRUE(m0 >= m1);
+		EXPECT_TRUE(m0 <= m1);
+
+		m0.insert(std::make_pair(0, 42));
+
+		EXPECT_FALSE(m0 == m1);
+		EXPECT_TRUE(m0 != m1);
+		EXPECT_FALSE(m0 < m1);
+		EXPECT_TRUE(m0 > m1);
+		EXPECT_TRUE(m0 >= m1);
+		EXPECT_FALSE(m0 <= m1);
+
+		EXPECT_FALSE(m1 == m0);
+		EXPECT_TRUE(m1 != m0);
+		EXPECT_TRUE(m1 < m0);
+		EXPECT_FALSE(m1 > m0);
+		EXPECT_FALSE(m1 >= m0);
+		EXPECT_TRUE(m1 <= m0);
+
+
+		m1.insert(std::make_pair(0, 42));
+
+		EXPECT_TRUE(m0 == m1);
+		EXPECT_FALSE(m0 != m1);
+		EXPECT_FALSE(m0 < m1);
+		EXPECT_FALSE(m0 > m1);
+		EXPECT_TRUE(m0 >= m1);
+		EXPECT_TRUE(m0 <= m1);
+
+		m0.insert(std::make_pair(1, 43));
+		m1.insert(std::make_pair(1, 42));
+
+		EXPECT_FALSE(m0 == m1);
+		EXPECT_TRUE(m0 != m1);
+		EXPECT_FALSE(m0 < m1);
+		EXPECT_TRUE(m0 > m1);
+		EXPECT_TRUE(m0 >= m1);
+		EXPECT_FALSE(m0 <= m1);
+
+		ft::map< int, int > m2;
+		ft::map< int, int > m3;
+
+		m2.insert(std::make_pair(2, 42));
+		m3.insert(std::make_pair(2, 43));
+
+		EXPECT_FALSE(m2 == m3);
+		EXPECT_TRUE(m2 != m3);
+		EXPECT_TRUE(m2 < m3);
+		EXPECT_FALSE(m2 > m3);
+		EXPECT_FALSE(m2 >= m3);
+		EXPECT_TRUE(m2 <= m3);
 	}
 
 	TEST(VectorBasicTest, LegacyRandomAccessIterator)
