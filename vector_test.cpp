@@ -1,6 +1,7 @@
 #include <algorithm>
+#include <gtest/gtest-typed-test.h>
 #include <gtest/gtest.h>
-#include <vector.hpp>
+#include "../include/vector.hpp"
 #include <list>
 
 /*
@@ -1292,6 +1293,24 @@ namespace {
 
 	TYPED_TEST(VectorTest, TestResize)
 	{
+	}
+
+	TYPED_TEST(VectorTest, TestErase)
+	{
+		ft::vector< std::string > vec(10);
+		for (unsigned long int i = 0; i < vec.size(); ++i)
+				vec[i] = std::string((vec.size() - i), i + 65);
+
+		std::vector< std::string > stdVec(10);
+		for (unsigned long int i = 0; i < stdVec.size(); ++i)
+				stdVec[i] = std::string((stdVec.size() - i), i + 65);
+
+		EXPECT_EQ(stdVec.size(), vec.size());
+
+		ft::vector< std::string >::iterator it(vec.erase(vec.begin() + 2));
+		std::vector< std::string >::iterator stdIt(stdVec.erase(stdVec.begin() + 2));
+
+		EXPECT_STREQ(it->c_str(), stdIt->c_str());
 	}
 
 	TYPED_TEST(VectorTest, TestEraseFirstLast)
