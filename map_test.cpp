@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include "../include/map.hpp"
+#include "../include/utility.hpp"
 #include <list>
 #include <map>
 
@@ -211,4 +212,55 @@ namespace {
 		EXPECT_FALSE(comp_key(it->first, 100));
 		EXPECT_FALSE(comp_val(*it, val));
 	}
+
+	TEST(PairTest, CanCreateDefaultPair) {
+		ft::pair<int, double> p;
+		EXPECT_EQ(0, p.first);
+		EXPECT_EQ(0.0, p.second);
+	}
+
+	TEST(PairTest, CanCreatePairWithValues) {
+		ft::pair<int, double> p(42, 3.14);
+		EXPECT_EQ(42, p.first);
+		EXPECT_EQ(3.14, p.second);
+	}
+
+	TEST(PairTest, CanAccessPairElements) {
+		ft::pair<int, double> p(42, 3.14);
+		EXPECT_EQ(42, p.first);
+		EXPECT_EQ(3.14, p.second);
+		p.first = 13;
+		p.second = 2.71;
+		EXPECT_EQ(13, p.first);
+		EXPECT_EQ(2.71, p.second);
+	}
+	
+	TEST(PairTest, CanCopyConstructPair) {
+		ft::pair<int, double> p(42, 3.14);
+		ft::pair<int, double> p_copy(p);
+		EXPECT_EQ(p.first, p_copy.first);
+		EXPECT_EQ(p.second, p_copy.second);
+	}
+	
+	TEST(PairTest, CanAssignPair) {
+		ft::pair<int, double> p(42, 3.14);
+		ft::pair<int, double> p_copy;
+		p_copy = p;
+		EXPECT_EQ(p.first, p_copy.first);
+		EXPECT_EQ(p.second, p_copy.second);
+	}
+	
+	TEST(PairTest, CanComparePairs) {
+		ft::pair<int, double> p1(42, 3.14);
+		ft::pair<int, double> p2(13, 2.71);
+		ft::pair<int, double> p3(42, 3.14);
+		EXPECT_TRUE(p1 != p2);
+		EXPECT_TRUE(p1 == p3);
+		EXPECT_FALSE(p2 == p3);
+		EXPECT_TRUE(p2 < p3);
+		EXPECT_TRUE(p3 > p2);
+		EXPECT_TRUE(p3 >= p1);
+		EXPECT_TRUE(p3 <= p1);
+	}
+
 }  // namespace
