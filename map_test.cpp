@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include "../include/map.hpp"
 #include "../include/utility.hpp"
+#include <utility>
 #include <list>
 #include <map>
 
@@ -261,6 +262,40 @@ namespace {
 		EXPECT_TRUE(p3 > p2);
 		EXPECT_TRUE(p3 >= p1);
 		EXPECT_TRUE(p3 <= p1);
+	}
+
+	int	&ref_wrap(int &n)
+	{
+		return (n);
+	}
+
+	template<typename T>
+	class reference_wrapper {
+	public:
+	    reference_wrapper(T& value) : ref(&value) {}
+	    operator T&() const { return *ref; }
+	private:
+	    T* ref;
+	};
+	
+	template<typename T>
+	reference_wrapper<T> ref(T& value) {
+	    return reference_wrapper<T>(value);
+	}
+
+	TEST(MakePairTest, CanCreatePairWithMakePair)
+	{
+		int n = 1;	
+		int a[5] = {1, 2, 3, 4, 5};
+
+		ft::pair<int, int> p1 = ft::make_pair(n, a[1]);
+		EXPECT_EQ(p1.first, 1);
+		EXPECT_EQ(p1.second, 2);
+
+		ft::pair<reference_wrapper<int>, int *> p2 = ft::make_pair(ref(n), a);
+		n = 42;
+		EXPECT_EQ(p2.first, 42);
+		EXPECT_EQ(*(p2.second + 2), 3);
 	}
 
 }  // namespace
