@@ -16,6 +16,12 @@
 
 namespace {
 
+	template < class T1, class T2 >
+	bool comp_pair(const ft::pair< T1, T2 > &p1, const std::pair< T1, T2 > &p2)
+	{
+		return (p1.first == p2.first && p1.second == p2.second);
+	}
+
 	TEST(MapBasicTest, DefaultConstructor)
 	{
 		ft::map< std::string, int > myMap;
@@ -25,6 +31,18 @@ namespace {
 		EXPECT_EQ(myMap.size(), stdMap.size());
 		EXPECT_TRUE(myMap.get_allocator() == stdMap.get_allocator());
 		EXPECT_EQ(myMap.count(""), stdMap.count(""));
+		EXPECT_THROW({
+			try
+			{
+				myMap.at("");
+			}
+			catch (const std::exception &e)
+			{
+				EXPECT_STREQ("map::at", e.what());
+				throw;
+			}
+		}, std::out_of_range);
+		EXPECT_EQ(myMap[""], stdMap[""]);
 	}
 
 	TEST(MapBasicTest, DISABLED_SegfaultTest)
@@ -35,11 +53,6 @@ namespace {
 		 }, testing::KilledBySignal(SIGSEGV), ".*");
 	}
 
-	template < class T1, class T2 >
-	bool comp_pair(const ft::pair< T1, T2 > &p1, const std::pair< T1, T2 > &p2)
-	{
-		return (p1.first == p2.first && p1.second == p2.second);
-	}
 
 	TEST(MapBasicTest, InsertMethod1)
 	{
@@ -65,6 +78,8 @@ namespace {
 		{
 			EXPECT_EQ(myMap.count(i), stdMap.count(i));
 			EXPECT_EQ(myMap.find(i)->first, stdMap.find(i)->first);
+			EXPECT_EQ(myMap.at(i), stdMap.at(i));
+			EXPECT_EQ(myMap[i], stdMap[i]);
 		}
 		EXPECT_EQ((--myMap.find(404))->first, (--stdMap.find(404))->first);
 		EXPECT_EQ(myMap.count(404), stdMap.count(404));
