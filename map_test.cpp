@@ -319,4 +319,15 @@ namespace {
 		EXPECT_EQ(*(p2.second + 2), 3);
 	}
 
+	TEST(MapBasicTest, OperatorEqual)
+	{
+		ft::map< int, int > m0;
+		ft::map< int, int > m1;
+
+		for (int i = 0; i < 10; ++i)
+			m1.insert(ft::make_pair(i, i));
+		EXPECT_FALSE(m1 == m0);
+		m0 = m1;
+		EXPECT_TRUE(m1 == m0);
+	}
 }  // namespace
