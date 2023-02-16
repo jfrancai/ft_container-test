@@ -365,4 +365,21 @@ namespace {
 			EXPECT_TRUE(comp_pair(*myMap.upper_bound(i), *stdMap.upper_bound(i)));
 		EXPECT_TRUE(comp_pair(*(--myMap.upper_bound(42)), *(--stdMap.upper_bound(42))));
 	}
+
+
+	TEST(MapBasicTest, EqualRangeMethod)
+	{
+		ft::map< int, int > myMap;
+		std::map< int, int > stdMap;
+
+		for (int i = 0; i < 20;)
+		{	
+			myMap.insert(ft::make_pair(i, i));
+			stdMap.insert(std::make_pair(i, i));
+			i += 4;
+		}
+
+		EXPECT_TRUE((myMap.equal_range(7).first == myMap.lower_bound(7)) == (stdMap.equal_range(7).first == stdMap.lower_bound(7)));
+		EXPECT_TRUE((myMap.equal_range(7).second == myMap.upper_bound(7)) == (stdMap.equal_range(7).second == stdMap.upper_bound(7)));
+	}
 }  // namespace
