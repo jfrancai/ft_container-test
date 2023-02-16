@@ -35,20 +35,26 @@ namespace {
 		 }, testing::KilledBySignal(SIGSEGV), ".*");
 	}
 
+	template < class T1, class T2 >
+	bool comp_pair(const ft::pair< T1, T2 > &p1, const std::pair< T1, T2 > &p2)
+	{
+		return (p1.first == p2.first && p1.second == p2.second);
+	}
+
 	TEST(MapBasicTest, InsertMethod1)
 	{
 		ft::map< int, int > myMap;
 		std::map< int, int > stdMap;
-		myMap.insert(std::make_pair(42, 42));
+		myMap.insert(ft::make_pair(42, 42));
 		stdMap.insert(std::make_pair(42, 42));
 
-		myMap.insert(std::make_pair(42, 42));
+		myMap.insert(ft::make_pair(42, 42));
 		stdMap.insert(std::make_pair(42, 42));
 
-		myMap.insert(std::make_pair(43, 43));
+		myMap.insert(ft::make_pair(43, 43));
 		stdMap.insert(std::make_pair(43, 43));
 
-		myMap.insert(std::make_pair(44, 44));
+		myMap.insert(ft::make_pair(44, 44));
 		stdMap.insert(std::make_pair(44, 44));
 
 		EXPECT_TRUE(myMap.get_allocator() == stdMap.get_allocator());
@@ -58,15 +64,15 @@ namespace {
 		for (int i = 42; i < 45; ++i)
 		{
 			EXPECT_EQ(myMap.count(i), stdMap.count(i));
-			EXPECT_EQ(*myMap.find(i), *stdMap.find(i));
+			EXPECT_EQ(myMap.find(i)->first, stdMap.find(i)->first);
 		}
-		EXPECT_EQ(*(--myMap.find(404)), *(--stdMap.find(404)));
+		EXPECT_EQ((--myMap.find(404))->first, (--stdMap.find(404))->first);
 		EXPECT_EQ(myMap.count(404), stdMap.count(404));
 
-		EXPECT_EQ(*myMap.begin(), *stdMap.begin());
-		EXPECT_EQ(*(--myMap.end()), *(--stdMap.end()));
-		EXPECT_EQ(*myMap.rbegin(), *stdMap.rbegin());
-		EXPECT_EQ(*(--(myMap.rend())), *(--stdMap.rend()));
+		EXPECT_TRUE(comp_pair(*myMap.begin(), *stdMap.begin()));
+		EXPECT_TRUE(comp_pair(*(--myMap.end()), *(--stdMap.end())));
+		EXPECT_TRUE(comp_pair(*myMap.rbegin(), *stdMap.rbegin()));
+		EXPECT_TRUE(comp_pair(*(--(myMap.rend())), *(--stdMap.rend())));
 		EXPECT_TRUE((myMap == myMap) ==  (stdMap == stdMap));
 		EXPECT_TRUE((myMap != myMap) ==  (stdMap != stdMap));
 		EXPECT_TRUE((myMap < myMap) ==  (stdMap < stdMap));
@@ -87,7 +93,7 @@ namespace {
 		EXPECT_TRUE(m0 >= m1);
 		EXPECT_TRUE(m0 <= m1);
 
-		m0.insert(std::make_pair(0, 42));
+		m0.insert(ft::make_pair(0, 42));
 
 		EXPECT_FALSE(m0 == m1);
 		EXPECT_TRUE(m0 != m1);
@@ -104,7 +110,7 @@ namespace {
 		EXPECT_TRUE(m1 <= m0);
 
 
-		m1.insert(std::make_pair(0, 42));
+		m1.insert(ft::make_pair(0, 42));
 
 		EXPECT_TRUE(m0 == m1);
 		EXPECT_FALSE(m0 != m1);
@@ -113,8 +119,8 @@ namespace {
 		EXPECT_TRUE(m0 >= m1);
 		EXPECT_TRUE(m0 <= m1);
 
-		m0.insert(std::make_pair(1, 43));
-		m1.insert(std::make_pair(1, 42));
+		m0.insert(ft::make_pair(1, 43));
+		m1.insert(ft::make_pair(1, 42));
 
 		EXPECT_FALSE(m0 == m1);
 		EXPECT_TRUE(m0 != m1);
@@ -126,8 +132,8 @@ namespace {
 		ft::map< int, int > m2;
 		ft::map< int, int > m3;
 
-		m2.insert(std::make_pair(2, 42));
-		m3.insert(std::make_pair(2, 43));
+		m2.insert(ft::make_pair(2, 42));
+		m3.insert(ft::make_pair(2, 43));
 
 		EXPECT_FALSE(m2 == m3);
 		EXPECT_TRUE(m2 != m3);
@@ -146,7 +152,7 @@ namespace {
 
 		for (int i = 0; i < 5; ++i)
 		{
-			myMap.insert(std::make_pair(i, 42));
+			myMap.insert(ft::make_pair(i, 42));
 			stdMap.insert(std::make_pair(i, 42));
 		}
 
@@ -154,7 +160,7 @@ namespace {
 		std::map< int, int >::iterator stdIt(stdMap.begin());
 
 
-		EXPECT_EQ(*myMap.begin(), *stdMap.begin());
+		EXPECT_TRUE(comp_pair(*myMap.begin(), *stdMap.begin()));
 
 		myIt = myMap.end();
 		stdIt = stdMap.end();
@@ -162,16 +168,16 @@ namespace {
 
 		for (int i = 5; i < 10; ++i)
 		{
-			myMap.insert(std::make_pair(i, 43));
+			myMap.insert(ft::make_pair(i, 43));
 			stdMap.insert(std::make_pair(i, 43));
 		}
-		EXPECT_EQ(*(--myIt), *(--stdIt));
+		EXPECT_TRUE(comp_pair(*(--myIt), *(--stdIt)));
 
 		ft::map< int, int >::iterator myIt2(--myMap.end());
 		std::map< int, int >::iterator stdIt2(--stdMap.end());
 
-		EXPECT_EQ(*myIt, *stdIt);
-		EXPECT_EQ(*myIt2, *stdIt2);
+		EXPECT_TRUE(comp_pair(*myIt, *stdIt));
+		EXPECT_TRUE(comp_pair(*myIt2, *stdIt2));
 	}
 
 	// Example module 97 key compare function
@@ -186,16 +192,16 @@ namespace {
 	{
 		ft::map<int, char, ModCmp> cont;
 
-		cont.insert(std::make_pair(1, 'a'));
-		cont.insert(std::make_pair(2, 'b'));
-		cont.insert(std::make_pair(3, 'c'));
-		cont.insert(std::make_pair(4, 'd'));
-		cont.insert(std::make_pair(5, 'e'));
+		cont.insert(ft::make_pair(1, 'a'));
+		cont.insert(ft::make_pair(2, 'b'));
+		cont.insert(ft::make_pair(3, 'c'));
+		cont.insert(ft::make_pair(4, 'd'));
+		cont.insert(ft::make_pair(5, 'e'));
 
 		ft::map< int, char, ModCmp >::value_compare comp_val = cont.value_comp();
 		ft::map< int, char, ModCmp >::key_compare comp_key = cont.key_comp();
 
-		const std::pair<int, char> val = std::make_pair(100, 'a');
+		const ft::pair<int, char> val = ft::make_pair(100, 'a');
 
 		ft::map< int, char, ModCmp >::iterator it = cont.begin();
 		EXPECT_TRUE(comp_key(it->first, 100));
