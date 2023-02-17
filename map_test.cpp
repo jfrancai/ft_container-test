@@ -1,7 +1,10 @@
 #include <algorithm>
 #include <gtest/gtest.h>
-#include <map.hpp>
+#include "../include/map.hpp"
+#include "../include/utility.hpp"
+#include <utility>
 #include <list>
+#include <map>
 
 /*
  * [ google test v1.8.1 in use for compatibility reasons ]
@@ -13,59 +16,84 @@
 
 namespace {
 
+	template < class T1, class T2 >
+	bool comp_pair(const ft::pair< T1, T2 > &p1, const std::pair< T1, T2 > &p2)
+	{
+		return (p1.first == p2.first && p1.second == p2.second);
+	}
+
 	TEST(MapBasicTest, DefaultConstructor)
 	{
 		ft::map< std::string, int > myMap;
 		std::map< std::string, int > stdMap;
 
-		EXPECT_TRUE(myMap.empty() == stdMap.empty());
+		EXPECT_TRUE((myMap.empty() == true) == (stdMap.empty() == true));
 		EXPECT_EQ(myMap.size(), stdMap.size());
 		EXPECT_TRUE(myMap.get_allocator() == stdMap.get_allocator());
+		EXPECT_EQ(myMap.count(""), stdMap.count(""));
+		EXPECT_THROW({
+			try
+			{
+				myMap.at("");
+			}
+			catch (const std::exception &e)
+			{
+				EXPECT_STREQ("map::at", e.what());
+				throw;
+			}
+		}, std::out_of_range);
+		EXPECT_EQ(myMap[""], stdMap[""]);
 	}
+
+	TEST(MapBasicTest, DISABLED_SegfaultTest)
+	{
+		ft::map< std::string, int > myMap;
+		EXPECT_EXIT({
+			 std::cout << (*myMap.find("")).first;
+		 }, testing::KilledBySignal(SIGSEGV), ".*");
+	}
+
 
 	TEST(MapBasicTest, InsertMethod1)
 	{
 		ft::map< int, int > myMap;
-		ft::map< int, int > myMap2;
-
 		std::map< int, int > stdMap;
-
-		myMap.insert(std::make_pair(42, 42));
+		myMap.insert(ft::make_pair(42, 42));
 		stdMap.insert(std::make_pair(42, 42));
 
-		myMap.insert(std::make_pair(42, 42));
+		myMap.insert(ft::make_pair(42, 42));
 		stdMap.insert(std::make_pair(42, 42));
 
-		myMap.insert(std::make_pair(43, 43));
+		myMap.insert(ft::make_pair(43, 43));
 		stdMap.insert(std::make_pair(43, 43));
 
-		myMap.insert(std::make_pair(44, 44));
+		myMap.insert(ft::make_pair(44, 44));
 		stdMap.insert(std::make_pair(44, 44));
-
-		myMap.getTree().printTree();
 
 		EXPECT_TRUE(myMap.get_allocator() == stdMap.get_allocator());
 		EXPECT_TRUE(myMap.empty() == stdMap.empty());
 		EXPECT_EQ(myMap.size(), stdMap.size());
-//		EXPECT_EQ(myMap.max_size(), stdMap.max_size());
-		EXPECT_EQ(*myMap.begin(), *stdMap.begin());
-		EXPECT_EQ(*(--myMap.end()), *(--stdMap.end()));
-		EXPECT_EQ(*myMap.rbegin(), *stdMap.rbegin());
-		EXPECT_EQ(*(--myMap.rend()), *(--stdMap.rend()));
+		EXPECT_EQ(myMap.max_size(), stdMap.max_size());
+		for (int i = 42; i < 45; ++i)
+		{
+			EXPECT_EQ(myMap.count(i), stdMap.count(i));
+			EXPECT_EQ(myMap.find(i)->first, stdMap.find(i)->first);
+			EXPECT_EQ(myMap.at(i), stdMap.at(i));
+			EXPECT_EQ(myMap[i], stdMap[i]);
+		}
+		EXPECT_EQ((--myMap.find(404))->first, (--stdMap.find(404))->first);
+		EXPECT_EQ(myMap.count(404), stdMap.count(404));
+
+		EXPECT_TRUE(comp_pair(*myMap.begin(), *stdMap.begin()));
+		EXPECT_TRUE(comp_pair(*(--myMap.end()), *(--stdMap.end())));
+		EXPECT_TRUE(comp_pair(*myMap.rbegin(), *stdMap.rbegin()));
+		EXPECT_TRUE(comp_pair(*(--(myMap.rend())), *(--stdMap.rend())));
 		EXPECT_TRUE((myMap == myMap) ==  (stdMap == stdMap));
 		EXPECT_TRUE((myMap != myMap) ==  (stdMap != stdMap));
 		EXPECT_TRUE((myMap < myMap) ==  (stdMap < stdMap));
 		EXPECT_TRUE((myMap <= myMap) ==  (stdMap <= stdMap));
-		/*
 		EXPECT_TRUE((myMap > myMap) ==  (stdMap > stdMap));
 		EXPECT_TRUE((myMap >= myMap) ==  (stdMap >= stdMap));
-
-		for (ft::vector< int >::size_type i = 0; i < myMap.size(); ++i)
-		{
-			EXPECT_EQ(myMap[i], stdMap[i]);
-			EXPECT_EQ(myMap.at(i), stdMap.at(i));
-		}
-		*/
 	}
 
 	TEST(MapBasicTest, Comparators)
@@ -80,7 +108,7 @@ namespace {
 		EXPECT_TRUE(m0 >= m1);
 		EXPECT_TRUE(m0 <= m1);
 
-		m0.insert(std::make_pair(0, 42));
+		m0.insert(ft::make_pair(0, 42));
 
 		EXPECT_FALSE(m0 == m1);
 		EXPECT_TRUE(m0 != m1);
@@ -97,7 +125,7 @@ namespace {
 		EXPECT_TRUE(m1 <= m0);
 
 
-		m1.insert(std::make_pair(0, 42));
+		m1.insert(ft::make_pair(0, 42));
 
 		EXPECT_TRUE(m0 == m1);
 		EXPECT_FALSE(m0 != m1);
@@ -106,8 +134,8 @@ namespace {
 		EXPECT_TRUE(m0 >= m1);
 		EXPECT_TRUE(m0 <= m1);
 
-		m0.insert(std::make_pair(1, 43));
-		m1.insert(std::make_pair(1, 42));
+		m0.insert(ft::make_pair(1, 43));
+		m1.insert(ft::make_pair(1, 42));
 
 		EXPECT_FALSE(m0 == m1);
 		EXPECT_TRUE(m0 != m1);
@@ -119,8 +147,8 @@ namespace {
 		ft::map< int, int > m2;
 		ft::map< int, int > m3;
 
-		m2.insert(std::make_pair(2, 42));
-		m3.insert(std::make_pair(2, 43));
+		m2.insert(ft::make_pair(2, 42));
+		m3.insert(ft::make_pair(2, 43));
 
 		EXPECT_FALSE(m2 == m3);
 		EXPECT_TRUE(m2 != m3);
@@ -130,927 +158,228 @@ namespace {
 		EXPECT_TRUE(m2 <= m3);
 	}
 
-	TEST(VectorBasicTest, LegacyRandomAccessIterator)
+
+	TEST(MapBasicTest, Iterators)
 	{
-		/*
-		ft::vector< std::string > fruits;
 
-		fruits.push_back("orange");
-		fruits.push_back("banane");
-		fruits.push_back("pineapple");
-		fruits.push_back("mango");
-		fruits.push_back("cherry");
-		fruits.push_back("apple");
+		ft::map< int, int > myMap;
+		std::map< int, int > stdMap;
 
-		// Default construct
-		ft::vector< std::string >::iterator it0;
+		for (int i = 0; i < 5; ++i)
+		{
+			myMap.insert(ft::make_pair(i, 42));
+			stdMap.insert(std::make_pair(i, 42));
+		}
 
-		// Copy assignable
-		it0 = fruits.begin();
-		EXPECT_STREQ((*it0).c_str(), "orange");
+		ft::map< int, int >::iterator myIt(myMap.begin());
+		std::map< int, int >::iterator stdIt(stdMap.begin());
 
-		// Copy construct
-		ft::vector< std::string >::iterator it1(it0);
-		EXPECT_STREQ((*it1).c_str(), "orange");
 
-		// Equality comparable
-		EXPECT_TRUE(it0 == it1);
-		// Inequality comparable
-		EXPECT_FALSE(it0 != it1);
+		EXPECT_TRUE(comp_pair(*myMap.begin(), *stdMap.begin()));
 
-		// Pre-increment
-		++it1;
-		EXPECT_STREQ((*it1).c_str(), "banane");
+		myIt = myMap.end();
+		stdIt = stdMap.end();
 
-		EXPECT_FALSE(it0 == it1);
-		EXPECT_TRUE(it0 != it1);
 
-		// Swappable
-		ft::swap(it0, it1);
+		for (int i = 5; i < 10; ++i)
+		{
+			myMap.insert(ft::make_pair(i, 43));
+			stdMap.insert(std::make_pair(i, 43));
+		}
+		EXPECT_TRUE(comp_pair(*(--myIt), *(--stdIt)));
 
-		EXPECT_STREQ((*it1).c_str(), "orange");
-		EXPECT_STREQ((*it0).c_str(), "banane");
+		ft::map< int, int >::iterator myIt2(--myMap.end());
+		std::map< int, int >::iterator stdIt2(--stdMap.end());
 
-		// operator->
-		EXPECT_STREQ(it1->c_str(), "orange");
-		EXPECT_STREQ(it0->c_str(), "banane");
-
-		// Post-inc
-		EXPECT_STREQ((it1++)->c_str(), "orange");
-		EXPECT_STREQ(it1->c_str(), "banane");
-		it0 = fruits.begin();
-		EXPECT_STREQ((*it0++).c_str(), "orange");
-
-		it0 = fruits.begin();
-		ft::vector< std::string >::iterator it0copy(it0);
-		it0copy++;
-		EXPECT_STREQ(it0->c_str(), "orange");
-		EXPECT_STREQ(it0copy->c_str(), "banane");
-
-		it0copy = it0;
-		EXPECT_TRUE(++it0 == ++it0copy);
-		EXPECT_STREQ(it0copy->c_str(), "banane");
-		EXPECT_STREQ(it0->c_str(), "banane");
-
-		// Pre-inc
-		EXPECT_STREQ((--it1)->c_str(), "orange");
-		++it1;
-		EXPECT_STREQ((it1--)->c_str(), "banane");
-		EXPECT_STREQ(it1->c_str(), "orange");
-
-		// operator>
-		EXPECT_TRUE(++it1 > --it0);
-
-		// operator<
-		EXPECT_FALSE(it1 < it0);
-
-		// operator<=
-		EXPECT_TRUE(--it0copy <= it0);
-
-		// operator>=
-		EXPECT_TRUE(it0copy >= it0);
-
-		// operator+=
-		it0 += 3;
-		EXPECT_STREQ(it0->c_str(), "mango");
-
-		// operator+
-		EXPECT_STREQ((it0 + 2)->c_str(), "apple");
-		EXPECT_STREQ((2 + it0)->c_str(), "apple");
-
-		// operator-=
-		it0 -= 1;
-		EXPECT_STREQ(it0->c_str(), "pineapple");
-		it0 -= -1;
-		EXPECT_STREQ(it0->c_str(), "mango");
-
-		// operator-
-		EXPECT_STREQ((it0 - 1)->c_str(), "pineapple");
-		EXPECT_STREQ((it0 - -1)->c_str(), "cherry");
-		EXPECT_EQ((it0 + 5) - it0, std::ptrdiff_t(5));
-
-		//operator[]
-		EXPECT_STREQ(it0[1].c_str(), "cherry");
-		EXPECT_STREQ(it0[-1].c_str(), "pineapple");
-
-		// Default construct
-		ft::vector< std::string >::iterator it2;
-
-		// Copy assignable
-		it2 = fruits.begin();
-		EXPECT_STREQ((*it2).c_str(), "orange");
-
-		// Copy construct
-		ft::vector< std::string >::iterator it3(it2);
-		EXPECT_STREQ((*it3).c_str(), "orange");
-
-		// Equality comparable
-		EXPECT_TRUE(it2 == it3);
-		// Inequality comparable
-		EXPECT_FALSE(it2 != it3);
-
-		// Pre-increment
-		++it3;
-		EXPECT_STREQ((*it3).c_str(), "banane");
-
-		EXPECT_FALSE(it2 == it3);
-		EXPECT_TRUE(it2 != it3);
-
-		// Swappable
-		ft::swap(it2, it3);
-
-		EXPECT_STREQ((*it3).c_str(), "orange");
-		EXPECT_STREQ((*it2).c_str(), "banane");
-
-		// operator->
-		EXPECT_STREQ(it3->c_str(), "orange");
-		EXPECT_STREQ(it2->c_str(), "banane");
-
-		// post-inc
-		EXPECT_STREQ((it3++)->c_str(), "orange");
-		EXPECT_STREQ(it3->c_str(), "banane");
-		it2 = fruits.begin();
-		EXPECT_STREQ((*it2++).c_str(), "orange");
-
-		it2 = fruits.begin();
-		ft::vector< std::string >::iterator it2copy(it2);
-		it2copy++;
-		EXPECT_STREQ(it2->c_str(), "orange");
-		EXPECT_STREQ(it2copy->c_str(), "banane");
-
-		it2copy = it2;
-		EXPECT_TRUE(++it2 == ++it2copy);
-		EXPECT_STREQ(it2copy->c_str(), "banane");
-		EXPECT_STREQ(it2->c_str(), "banane");
-
-		// pre-inc
-		EXPECT_STREQ((--it3)->c_str(), "orange");
-		++it3;
-		EXPECT_STREQ((it3--)->c_str(), "banane");
-		EXPECT_STREQ(it3->c_str(), "orange");
-
-		EXPECT_TRUE(++it3 > --it2);
-		EXPECT_FALSE(it3 < it2);
-		EXPECT_TRUE(--it2copy <= it2);
-		EXPECT_TRUE(it2copy >= it2);
-		ft::vector<int> vect;
-		vect.push_back(42);
-		vect.push_back(43);
-
-		ft::vector<int>::iterator ite(vect.begin());
-		*ite = *(ite + 1);
-
-		EXPECT_EQ(*ite, 43);
-		*/
+		EXPECT_TRUE(comp_pair(*myIt, *stdIt));
+		EXPECT_TRUE(comp_pair(*myIt2, *stdIt2));
 	}
 
-	/*
-	TEST(VectorBasicTest, ConstLegacyRandomAccessIterator)
+	// Example module 97 key compare function
+	struct ModCmp {
+		bool operator()(const int lhs, const int rhs) const
+		{
+			return (lhs % 97) < (rhs % 97);
+		}
+	};
+
+	TEST(MapBasicTest, valueComp)
 	{
-		ft::vector< std::string > fruits;
+		ft::map<int, char, ModCmp> cont;
 
-		fruits.push_back("orange");
-		fruits.push_back("banane");
-		fruits.push_back("pineapple");
-		fruits.push_back("mango");
-		fruits.push_back("cherry");
-		fruits.push_back("apple");
+		cont.insert(ft::make_pair(1, 'a'));
+		cont.insert(ft::make_pair(2, 'b'));
+		cont.insert(ft::make_pair(3, 'c'));
+		cont.insert(ft::make_pair(4, 'd'));
+		cont.insert(ft::make_pair(5, 'e'));
 
-		// Default construct
-		ft::vector< std::string >::const_iterator it0(fruits.begin());
-		EXPECT_STREQ((*it0).c_str(), "orange");
+		ft::map< int, char, ModCmp >::value_compare comp_val = cont.value_comp();
+		ft::map< int, char, ModCmp >::key_compare comp_key = cont.key_comp();
 
-		// Copy construct
-		ft::vector< std::string >::const_iterator it1(it0);
-		EXPECT_STREQ((*it1).c_str(), "orange");
+		const ft::pair<int, char> val = ft::make_pair(100, 'a');
 
-		// Equality comparable
-		EXPECT_TRUE(it0 == it1);
-		// Inequality comparable
-		EXPECT_FALSE(it0 != it1);
+		ft::map< int, char, ModCmp >::iterator it = cont.begin();
+		EXPECT_TRUE(comp_key(it->first, 100));
+		EXPECT_TRUE(comp_val(*it++, val));
 
-		// Pre-increment
-		++it1;
-		EXPECT_STREQ((*it1).c_str(), "banane");
+		EXPECT_TRUE(comp_key(it->first, 100));
+		EXPECT_TRUE(comp_val(*it++, val));
 
-		EXPECT_FALSE(it0 == it1);
-		EXPECT_TRUE(it0 != it1);
+		EXPECT_FALSE(comp_key(it->first, 100));
+		EXPECT_FALSE(comp_val(*it++, val));
 
-		// Swappable
-		ft::swap(it0, it1);
+		EXPECT_FALSE(comp_key(it->first, 100));
+		EXPECT_FALSE(comp_val(*it++, val));
 
-		EXPECT_STREQ((*it1).c_str(), "orange");
-		EXPECT_STREQ((*it0).c_str(), "banane");
-
-		// operator->
-		EXPECT_STREQ(it1->c_str(), "orange");
-		EXPECT_STREQ(it0->c_str(), "banane");
-
-		// Post-inc
-		EXPECT_STREQ((it1++)->c_str(), "orange");
-		EXPECT_STREQ(it1->c_str(), "banane");
-		it0 = fruits.begin();
-		EXPECT_STREQ((*it0++).c_str(), "orange");
-
-		it0 = fruits.begin();
-		ft::vector< std::string >::const_iterator it0copy(it0);
-		it0copy++;
-		EXPECT_STREQ(it0->c_str(), "orange");
-		EXPECT_STREQ(it0copy->c_str(), "banane");
-
-		it0copy = it0;
-		EXPECT_TRUE(++it0 == ++it0copy);
-		EXPECT_STREQ(it0copy->c_str(), "banane");
-		EXPECT_STREQ(it0->c_str(), "banane");
-
-		// Pre-inc
-		EXPECT_STREQ((--it1)->c_str(), "orange");
-		++it1;
-		EXPECT_STREQ((it1--)->c_str(), "banane");
-		EXPECT_STREQ(it1->c_str(), "orange");
-
-		// operator>
-		EXPECT_TRUE(++it1 > --it0);
-
-		// operator<
-		EXPECT_FALSE(it1 < it0);
-
-		// operator<=
-		EXPECT_TRUE(--it0copy <= it0);
-
-		// operator>=
-		EXPECT_TRUE(it0copy >= it0);
-
-		// operator+=
-		it0 += 3;
-		EXPECT_STREQ(it0->c_str(), "mango");
-
-		// operator+
-		EXPECT_STREQ((it0 + 2)->c_str(), "apple");
-		EXPECT_STREQ((2 + it0)->c_str(), "apple");
-
-		// operator-=
-		it0 -= 1;
-		EXPECT_STREQ(it0->c_str(), "pineapple");
-		it0 -= -1;
-		EXPECT_STREQ(it0->c_str(), "mango");
-
-		// operator-
-		EXPECT_STREQ((it0 - 1)->c_str(), "pineapple");
-		EXPECT_STREQ((it0 - -1)->c_str(), "cherry");
-		EXPECT_EQ((it0 + 5) - it0, std::ptrdiff_t(5));
-
-		//operator[]
-		EXPECT_STREQ(it0[1].c_str(), "cherry");
-		EXPECT_STREQ(it0[-1].c_str(), "pineapple");
-
-		ft::vector<int> vect;
-		vect.push_back(42);
-		vect.push_back(43);
-
-		ft::vector<int>::iterator ite(vect.begin());
-		*ite = *(ite + 1);
-
-		EXPECT_EQ(*ite, 43);
+		EXPECT_FALSE(comp_key(it->first, 100));
+		EXPECT_FALSE(comp_val(*it, val));
 	}
 
-
-	TEST(VectorBasicTest, CountConstructor)
-	{
-		ft::vector< int > myVec(42);
-
-		std::vector< int > stdVec(42);
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_EQ(myVec.front(), stdVec.front());
-		EXPECT_EQ(myVec.back(), stdVec.back());
-		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
-		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
-		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
-		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVec[i], stdVec[i]);
-			EXPECT_EQ(myVec.at(i), stdVec.at(i));
-		}
+	TEST(PairTest, CanCreateDefaultPair) {
+		ft::pair<int, double> p;
+		EXPECT_EQ(0, p.first);
+		EXPECT_EQ(0.0, p.second);
 	}
 
-	TEST(VectorBasicTest, CopyConstructor)
-	{
-		ft::vector< int > myVec;
-		myVec.push_back(1);
-		myVec.push_back(2);
-		myVec.push_back(3);
-
-		std::vector< int > stdVec;
-		stdVec.push_back(1);
-		stdVec.push_back(2);
-		stdVec.push_back(3);
-
-		ft::vector< int > myVecCopy(myVec);
-
-		std::vector< int > stdVecCopy(stdVec);
-
-		EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
-		EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
-		EXPECT_EQ(myVecCopy.size(), stdVecCopy.size());
-		EXPECT_EQ(myVecCopy.max_size(), stdVecCopy.max_size());
-		EXPECT_EQ(myVecCopy.capacity(), stdVecCopy.capacity());
-		EXPECT_EQ(myVecCopy.front(), stdVecCopy.front());
-		EXPECT_EQ(myVecCopy.back(), stdVecCopy.back());
-		EXPECT_EQ(*myVecCopy.begin(), *stdVecCopy.begin());
-		EXPECT_EQ(*(myVecCopy.end() - 1), *(stdVecCopy.end() - 1));
-		EXPECT_EQ(*myVecCopy.rbegin(), *stdVecCopy.rbegin());
-		EXPECT_EQ(*(myVecCopy.rend() - 1), *(stdVecCopy.rend() - 1));
-		EXPECT_TRUE((myVec == myVecCopy) ==  (stdVec == stdVecCopy));
-		EXPECT_TRUE((myVec != myVecCopy) ==  (stdVec != stdVecCopy));
-		EXPECT_TRUE((myVec < myVecCopy) ==  (stdVec < stdVecCopy));
-		EXPECT_TRUE((myVec <= myVecCopy) ==  (stdVec <= stdVecCopy));
-		EXPECT_TRUE((myVec > myVecCopy) ==  (stdVec > stdVecCopy));
-		EXPECT_TRUE((myVec >= myVecCopy) ==  (stdVec >= stdVecCopy));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVecCopy[i], stdVecCopy[i]);
-			EXPECT_EQ(myVecCopy.at(i), stdVecCopy.at(i));
-		}
+	TEST(PairTest, CanCreatePairWithValues) {
+		ft::pair<int, double> p(42, 3.14);
+		EXPECT_EQ(42, p.first);
+		EXPECT_EQ(3.14, p.second);
 	}
 
-	TEST(VectorBasicTest, IteratorConstructor)
-	{
-		ft::vector< int > vec;
-		vec.push_back(1);
-		vec.push_back(2);
-		vec.push_back(3);
-
-		ft::vector< int > myVec(vec.begin(), vec.end());
-		std::vector< int > stdVec(vec.begin(), vec.end());
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_EQ(myVec.front(), stdVec.front());
-		EXPECT_EQ(myVec.back(), stdVec.back());
-		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
-		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
-		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
-		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVec[i], stdVec[i]);
-			EXPECT_EQ(myVec.at(i), stdVec.at(i));
-		}
-	}
-
-	TEST(VectorBasicTest, AssignMethod1)
-	{
-		{
-			ft::vector< int > myVec;
-			myVec.push_back(1);
-			myVec.push_back(2);
-			myVec.push_back(3);
-
-			std::vector< int > stdVec;
-			stdVec.push_back(1);
-			stdVec.push_back(2);
-			stdVec.push_back(3);
-
-			ft::vector< int > myVecCopy;
-			std::vector< int > stdVecCopy;
-
-			myVecCopy.assign(0, 42);
-			stdVecCopy.assign(0, 42);
-
-			EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
-			EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
-			EXPECT_EQ(myVecCopy.size(), stdVecCopy.size());
-			EXPECT_EQ(myVecCopy.max_size(), stdVecCopy.max_size());
-			EXPECT_EQ(myVecCopy.capacity(), stdVecCopy.capacity());
-			EXPECT_TRUE((myVec == myVecCopy) ==  (stdVec == stdVecCopy));
-			EXPECT_TRUE((myVec != myVecCopy) ==  (stdVec != stdVecCopy));
-			EXPECT_TRUE((myVec < myVecCopy) ==  (stdVec < stdVecCopy));
-			EXPECT_TRUE((myVec <= myVecCopy) ==  (stdVec <= stdVecCopy));
-			EXPECT_TRUE((myVec > myVecCopy) ==  (stdVec > stdVecCopy));
-			EXPECT_TRUE((myVec >= myVecCopy) ==  (stdVec >= stdVecCopy));
-		}
-
-		{
-			ft::vector< int > myVec;
-			myVec.push_back(1);
-			myVec.push_back(2);
-			myVec.push_back(3);
-
-			std::vector< int > stdVec;
-			stdVec.push_back(1);
-			stdVec.push_back(2);
-			stdVec.push_back(3);
-
-			ft::vector< int > myVecCopy;
-			std::vector< int > stdVecCopy;
-
-			myVecCopy.assign(10, 42);
-			stdVecCopy.assign(10, 42);
-
-			EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
-			EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
-			EXPECT_EQ(myVecCopy.size(), stdVecCopy.size());
-			EXPECT_EQ(myVecCopy.max_size(), stdVecCopy.max_size());
-			EXPECT_EQ(myVecCopy.capacity(), stdVecCopy.capacity());
-			EXPECT_EQ(myVecCopy.front(), stdVecCopy.front());
-			EXPECT_EQ(myVecCopy.back(), stdVecCopy.back());
-			EXPECT_EQ(*myVecCopy.begin(), *stdVecCopy.begin());
-			EXPECT_EQ(*(myVecCopy.end() - 1), *(stdVecCopy.end() - 1));
-			EXPECT_EQ(*myVecCopy.rbegin(), *stdVecCopy.rbegin());
-			EXPECT_EQ(*(myVecCopy.rend() - 1), *(stdVecCopy.rend() - 1));
-			EXPECT_TRUE((myVec == myVecCopy) ==  (stdVec == stdVecCopy));
-			EXPECT_TRUE((myVec != myVecCopy) ==  (stdVec != stdVecCopy));
-			EXPECT_TRUE((myVec < myVecCopy) ==  (stdVec < stdVecCopy));
-			EXPECT_TRUE((myVec <= myVecCopy) ==  (stdVec <= stdVecCopy));
-			EXPECT_TRUE((myVec > myVecCopy) ==  (stdVec > stdVecCopy));
-			EXPECT_TRUE((myVec >= myVecCopy) ==  (stdVec >= stdVecCopy));
-
-			for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-			{
-				EXPECT_EQ(myVecCopy[i], stdVecCopy[i]);
-				EXPECT_EQ(myVecCopy.at(i), stdVecCopy.at(i));
-			}
-		}
-
-		{
-			ft::vector< int > myVec;
-			myVec.push_back(1);
-			myVec.push_back(2);
-			myVec.push_back(3);
-
-			std::vector< int > stdVec;
-			stdVec.push_back(1);
-			stdVec.push_back(2);
-			stdVec.push_back(3);
-
-			ft::vector< int > myVecCopy;
-			std::vector< int > stdVecCopy;
-
-			myVecCopy.assign(10, 42);
-			stdVecCopy.assign(10, 42);
-
-			EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
-			EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
-			EXPECT_EQ(myVecCopy.size(), stdVecCopy.size());
-			EXPECT_EQ(myVecCopy.max_size(), stdVecCopy.max_size());
-			EXPECT_EQ(myVecCopy.capacity(), stdVecCopy.capacity());
-			EXPECT_EQ(myVecCopy.front(), stdVecCopy.front());
-			EXPECT_EQ(myVecCopy.back(), stdVecCopy.back());
-			EXPECT_EQ(*myVecCopy.begin(), *stdVecCopy.begin());
-			EXPECT_EQ(*(myVecCopy.end() - 1), *(stdVecCopy.end() - 1));
-			EXPECT_EQ(*myVecCopy.rbegin(), *stdVecCopy.rbegin());
-			EXPECT_EQ(*(myVecCopy.rend() - 1), *(stdVecCopy.rend() - 1));
-			EXPECT_TRUE((myVec == myVecCopy) ==  (stdVec == stdVecCopy));
-			EXPECT_TRUE((myVec != myVecCopy) ==  (stdVec != stdVecCopy));
-			EXPECT_TRUE((myVec < myVecCopy) ==  (stdVec < stdVecCopy));
-			EXPECT_TRUE((myVec <= myVecCopy) ==  (stdVec <= stdVecCopy));
-			EXPECT_TRUE((myVec > myVecCopy) ==  (stdVec > stdVecCopy));
-			EXPECT_TRUE((myVec >= myVecCopy) ==  (stdVec >= stdVecCopy));
-
-			for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-			{
-				EXPECT_EQ(myVecCopy[i], stdVecCopy[i]);
-				EXPECT_EQ(myVecCopy.at(i), stdVecCopy.at(i));
-			}
-		}
-	}
-
-	TEST(VectorBasicTest, AssignMethod2)
-	{
-		{
-			ft::vector< int > myVec;
-			myVec.push_back(1);
-			myVec.push_back(2);
-			myVec.push_back(3);
-
-			std::vector< int > stdVec;
-			stdVec.push_back(1);
-			stdVec.push_back(2);
-			stdVec.push_back(3);
-
-			ft::vector< int > myVecCopy;
-			std::vector< int > stdVecCopy;
-
-			myVecCopy.assign(myVec.begin(), myVec.begin());
-			stdVecCopy.assign(stdVec.begin(), stdVec.begin());
-
-			EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
-			EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
-			EXPECT_EQ(myVecCopy.size(), stdVecCopy.size());
-			EXPECT_EQ(myVecCopy.max_size(), stdVecCopy.max_size());
-			EXPECT_EQ(myVecCopy.capacity(), stdVecCopy.capacity());
-			EXPECT_TRUE((myVec == myVecCopy) ==  (stdVec == stdVecCopy));
-			EXPECT_TRUE((myVec != myVecCopy) ==  (stdVec != stdVecCopy));
-			EXPECT_TRUE((myVec < myVecCopy) ==  (stdVec < stdVecCopy));
-			EXPECT_TRUE((myVec <= myVecCopy) ==  (stdVec <= stdVecCopy));
-			EXPECT_TRUE((myVec > myVecCopy) ==  (stdVec > stdVecCopy));
-			EXPECT_TRUE((myVec >= myVecCopy) ==  (stdVec >= stdVecCopy));
-		}
-
-		{
-			ft::vector< int > myVec;
-			myVec.push_back(1);
-			myVec.push_back(2);
-			myVec.push_back(3);
-
-			std::vector< int > stdVec;
-			stdVec.push_back(1);
-			stdVec.push_back(2);
-			stdVec.push_back(3);
-
-			ft::vector< int > myVecCopy;
-			std::vector< int > stdVecCopy;
-
-			myVecCopy.assign(myVec.begin(), myVec.end());
-			stdVecCopy.assign(stdVec.begin(), stdVec.end());
-
-			EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
-			EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
-			EXPECT_EQ(myVecCopy.size(), stdVecCopy.size());
-			EXPECT_EQ(myVecCopy.max_size(), stdVecCopy.max_size());
-			EXPECT_EQ(myVecCopy.capacity(), stdVecCopy.capacity());
-			EXPECT_EQ(myVecCopy.front(), stdVecCopy.front());
-			EXPECT_EQ(myVecCopy.back(), stdVecCopy.back());
-			EXPECT_EQ(*myVecCopy.begin(), *stdVecCopy.begin());
-			EXPECT_EQ(*(myVecCopy.end() - 1), *(stdVecCopy.end() - 1));
-			EXPECT_EQ(*myVecCopy.rbegin(), *stdVecCopy.rbegin());
-			EXPECT_EQ(*(myVecCopy.rend() - 1), *(stdVecCopy.rend() - 1));
-			EXPECT_TRUE((myVec == myVecCopy) ==  (stdVec == stdVecCopy));
-			EXPECT_TRUE((myVec != myVecCopy) ==  (stdVec != stdVecCopy));
-			EXPECT_TRUE((myVec < myVecCopy) ==  (stdVec < stdVecCopy));
-			EXPECT_TRUE((myVec <= myVecCopy) ==  (stdVec <= stdVecCopy));
-			EXPECT_TRUE((myVec > myVecCopy) ==  (stdVec > stdVecCopy));
-			EXPECT_TRUE((myVec >= myVecCopy) ==  (stdVec >= stdVecCopy));
-
-			for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-			{
-				EXPECT_EQ(myVecCopy[i], stdVecCopy[i]);
-				EXPECT_EQ(myVecCopy.at(i), stdVecCopy.at(i));
-			}
-		}
-	}
-
-	TEST(VectorBasicTest, AssignmentOperator)
-	{
-		ft::vector< int > myVec;
-		myVec.push_back(1);
-		myVec.push_back(2);
-		myVec.push_back(3);
-
-		std::vector< int > stdVec;
-		stdVec.push_back(1);
-		stdVec.push_back(2);
-		stdVec.push_back(3);
-
-		ft::vector< int > myVecCopy;
-
-		std::vector< int > stdVecCopy;
-
-		myVecCopy = myVec;
-		stdVecCopy = stdVec;
-
-		EXPECT_TRUE(myVecCopy.get_allocator() == stdVecCopy.get_allocator());
-		EXPECT_TRUE(myVecCopy.empty() == stdVecCopy.empty());
-		EXPECT_EQ(myVecCopy.size(), stdVecCopy.size());
-		EXPECT_EQ(myVecCopy.max_size(), stdVecCopy.max_size());
-		EXPECT_EQ(myVecCopy.capacity(), stdVecCopy.capacity());
-		EXPECT_EQ(myVecCopy.front(), stdVecCopy.front());
-		EXPECT_EQ(myVecCopy.back(), stdVecCopy.back());
-		EXPECT_EQ(*myVecCopy.begin(), *stdVecCopy.begin());
-		EXPECT_EQ(*(myVecCopy.end() - 1), *(stdVecCopy.end() - 1));
-		EXPECT_EQ(*myVecCopy.rbegin(), *stdVecCopy.rbegin());
-		EXPECT_EQ(*(myVecCopy.rend() - 1), *(stdVecCopy.rend() - 1));
-		EXPECT_TRUE((myVec == myVecCopy) ==  (stdVec == stdVecCopy));
-		EXPECT_TRUE((myVec != myVecCopy) ==  (stdVec != stdVecCopy));
-		EXPECT_TRUE((myVec < myVecCopy) ==  (stdVec < stdVecCopy));
-		EXPECT_TRUE((myVec <= myVecCopy) ==  (stdVec <= stdVecCopy));
-		EXPECT_TRUE((myVec > myVecCopy) ==  (stdVec > stdVecCopy));
-		EXPECT_TRUE((myVec >= myVecCopy) ==  (stdVec >= stdVecCopy));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVecCopy[i], stdVecCopy[i]);
-			EXPECT_EQ(myVecCopy.at(i), stdVecCopy.at(i));
-		}
+	TEST(PairTest, CanAccessPairElements) {
+		ft::pair<int, double> p(42, 3.14);
+		EXPECT_EQ(42, p.first);
+		EXPECT_EQ(3.14, p.second);
+		p.first = 13;
+		p.second = 2.71;
+		EXPECT_EQ(13, p.first);
+		EXPECT_EQ(2.71, p.second);
 	}
 	
-	TEST(VectorBasicTest, ReserveMethod)
-	{
-		ft::vector< int > myVec;
-		std::vector< int > stdVec;
-
-		myVec.reserve(10);
-		stdVec.reserve(10);
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
-
-
-		for (int i = 0; i < 15; i++)
-		{
-			myVec.push_back(i);
-			stdVec.push_back(i);
-		}
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_EQ(myVec.front(), stdVec.front());
-		EXPECT_EQ(myVec.back(), stdVec.back());
-		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
-		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
-		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
-		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVec[i], stdVec[i]);
-			EXPECT_EQ(myVec.at(i), stdVec.at(i));
-		}
+	TEST(PairTest, CanCopyConstructPair) {
+		ft::pair<int, double> p(42, 3.14);
+		ft::pair<int, double> p_copy(p);
+		EXPECT_EQ(p.first, p_copy.first);
+		EXPECT_EQ(p.second, p_copy.second);
+	}
+	
+	TEST(PairTest, CanAssignPair) {
+		ft::pair<int, double> p(42, 3.14);
+		ft::pair<int, double> p_copy;
+		p_copy = p;
+		EXPECT_EQ(p.first, p_copy.first);
+		EXPECT_EQ(p.second, p_copy.second);
+	}
+	
+	TEST(PairTest, CanComparePairs) {
+		ft::pair<int, double> p1(42, 3.14);
+		ft::pair<int, double> p2(13, 2.71);
+		ft::pair<int, double> p3(42, 3.14);
+		EXPECT_TRUE(p1 != p2);
+		EXPECT_TRUE(p1 == p3);
+		EXPECT_FALSE(p2 == p3);
+		EXPECT_TRUE(p2 < p3);
+		EXPECT_TRUE(p3 > p2);
+		EXPECT_TRUE(p3 >= p1);
+		EXPECT_TRUE(p3 <= p1);
 	}
 
-	TEST(VectorBasicTest, ClearMethod)
+	int	&ref_wrap(int &n)
 	{
-		ft::vector< int > myVec;
-		myVec.push_back(1);
-		myVec.push_back(2);
-		myVec.push_back(3);
-
-		std::vector< int > stdVec;
-		stdVec.push_back(1);
-		stdVec.push_back(2);
-		stdVec.push_back(3);
-
-		myVec.clear();
-		stdVec.clear();
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
+		return (n);
 	}
 
-	TEST(VectorBasicTest, InsertMethod2_0)
-	{
-		ft::vector< int > myVec;
-		myVec.push_back(1);
-		myVec.push_back(2);
-		myVec.push_back(3);
-
-		std::vector< int > stdVec;
-		stdVec.push_back(1);
-		stdVec.push_back(2);
-		stdVec.push_back(3);
-
-		myVec.insert(myVec.begin() + 1, 2, 10);
-		stdVec.insert(stdVec.begin() + 1, 2, 10);
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_EQ(myVec.front(), stdVec.front());
-		EXPECT_EQ(myVec.back(), stdVec.back());
-		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
-		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
-		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
-		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVec[i], stdVec[i]);
-			EXPECT_EQ(myVec.at(i), stdVec.at(i));
-		}
+	template<typename T>
+	class reference_wrapper {
+	public:
+	    reference_wrapper(T& value) : ref(&value) {}
+	    operator T&() const { return *ref; }
+	private:
+	    T* ref;
+	};
+	
+	template<typename T>
+	reference_wrapper<T> ref(T& value) {
+	    return reference_wrapper<T>(value);
 	}
 
-	TEST(VectorBasicTest, InsertMethod3)
+	TEST(MakePairTest, CanCreatePairWithMakePair)
 	{
-		ft::vector< int > myVec;
-		myVec.push_back(1);
-		myVec.push_back(2);
-		myVec.push_back(3);
-		myVec.push_back(4);
-		myVec.push_back(5);
+		int n = 1;	
+		int a[5] = {1, 2, 3, 4, 5};
 
-		std::vector< int > stdVec;
-		stdVec.push_back(1);
-		stdVec.push_back(2);
-		stdVec.push_back(3);
-		stdVec.push_back(4);
-		stdVec.push_back(5);
+		ft::pair<int, int> p1 = ft::make_pair(n, a[1]);
+		EXPECT_EQ(p1.first, 1);
+		EXPECT_EQ(p1.second, 2);
 
-		myVec.insert(myVec.begin() + 1, myVec.begin(), myVec.end());
-		stdVec.insert(stdVec.begin() + 1, stdVec.begin(), stdVec.end());
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_EQ(myVec.front(), stdVec.front());
-		EXPECT_EQ(myVec.back(), stdVec.back());
-		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
-		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
-		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
-		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVec[i], stdVec[i]);
-			EXPECT_EQ(myVec.at(i), stdVec.at(i));
-		}
+		ft::pair<reference_wrapper<int>, int *> p2 = ft::make_pair(ref(n), a);
+		n = 42;
+		EXPECT_EQ(p2.first, 42);
+		EXPECT_EQ(*(p2.second + 2), 3);
 	}
 
-	TEST(VectorBasicTest, PushBackMethod)
+	TEST(MapBasicTest, OperatorEqual)
 	{
-		ft::vector< int > myVec;
-		for (int i = 0; i < 42; ++i)
-			myVec.push_back(i);
+		ft::map< int, int > m0;
+		ft::map< int, int > m1;
 
-		std::vector< int > stdVec;
-		for (int i = 0; i < 42; ++i)
-			stdVec.push_back(i);
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_EQ(myVec.front(), stdVec.front());
-		EXPECT_EQ(myVec.back(), stdVec.back());
-		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
-		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
-		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
-		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVec[i], stdVec[i]);
-			EXPECT_EQ(myVec.at(i), stdVec.at(i));
-		}
+		for (int i = 0; i < 10; ++i)
+			m1.insert(ft::make_pair(i, i));
+		EXPECT_FALSE(m1 == m0);
+		m0 = m1;
+		EXPECT_TRUE(m1 == m0);
 	}
 
-	TEST(VectorBasicTest, PopBackMethod)
+	TEST(MapBasicTest, LowerBoundMethod)
 	{
-		ft::vector< int > myVec;
-		for (int i = 0; i < 42; ++i)
-			myVec.push_back(i);
+		ft::map< int, int > myMap;
+		std::map< int, int > stdMap;
 
-		std::vector< int > stdVec;
-		for (int i = 0; i < 42; ++i)
-			stdVec.push_back(i);
-
-		for (int i = 0; i < 21; ++i)
-			myVec.pop_back();
-
-		for (int i = 0; i < 21; ++i)
-			stdVec.pop_back();
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_EQ(myVec.front(), stdVec.front());
-		EXPECT_EQ(myVec.back(), stdVec.back());
-		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
-		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
-		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
-		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVec[i], stdVec[i]);
-			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		for (int i = 0; i < 20;)
+		{	
+			myMap.insert(ft::make_pair(i, i));
+			stdMap.insert(std::make_pair(i, i));
+			i+= 4;
 		}
+
+		for (int i = 0; i < 17; ++i)
+			EXPECT_TRUE(comp_pair(*myMap.lower_bound(i), *stdMap.lower_bound(i)));
+
+		EXPECT_TRUE(comp_pair(*(--myMap.lower_bound(42)), *(--stdMap.lower_bound(42))));
 	}
 
-	TEST(VectorBasicTest, ResizeMethod)
+	TEST(MapBasicTest, UpperBoundMethod)
 	{
-		ft::vector< int > myVec;
+		ft::map< int, int > myMap;
+		std::map< int, int > stdMap;
 
-		std::vector< int > stdVec;
-
-		myVec.resize(23, 42);
-		stdVec.resize(23, 42);
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_EQ(myVec.front(), stdVec.front());
-		EXPECT_EQ(myVec.back(), stdVec.back());
-		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
-		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
-		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
-		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVec[i], stdVec[i]);
-			EXPECT_EQ(myVec.at(i), stdVec.at(i));
+		for (int i = 0; i < 20;)
+		{	
+			myMap.insert(ft::make_pair(i, i));
+			stdMap.insert(std::make_pair(i, i));
+			i += 4;
 		}
 
-		myVec.resize(1000);
-		stdVec.resize(1000);
-
-		EXPECT_TRUE(myVec.get_allocator() == stdVec.get_allocator());
-		EXPECT_TRUE(myVec.empty() == stdVec.empty());
-		EXPECT_EQ(myVec.size(), stdVec.size());
-		EXPECT_EQ(myVec.max_size(), stdVec.max_size());
-		EXPECT_EQ(myVec.capacity(), stdVec.capacity());
-		EXPECT_EQ(myVec.front(), stdVec.front());
-		EXPECT_EQ(myVec.back(), stdVec.back());
-		EXPECT_EQ(*myVec.begin(), *stdVec.begin());
-		EXPECT_EQ(*(myVec.end() - 1), *(stdVec.end() - 1));
-		EXPECT_EQ(*myVec.rbegin(), *stdVec.rbegin());
-		EXPECT_EQ(*(myVec.rend() - 1), *(stdVec.rend() - 1));
-		EXPECT_TRUE((myVec == myVec) ==  (stdVec == stdVec));
-		EXPECT_TRUE((myVec != myVec) ==  (stdVec != stdVec));
-		EXPECT_TRUE((myVec < myVec) ==  (stdVec < stdVec));
-		EXPECT_TRUE((myVec <= myVec) ==  (stdVec <= stdVec));
-		EXPECT_TRUE((myVec > myVec) ==  (stdVec > stdVec));
-		EXPECT_TRUE((myVec >= myVec) ==  (stdVec >= stdVec));
-
-		for (ft::vector< int >::size_type i = 0; i < myVec.size(); ++i)
-		{
-			EXPECT_EQ(myVec[i], stdVec[i]);
-			EXPECT_EQ(myVec.at(i), stdVec.at(i));
-		}
+		for (int i = 0; i < 16; ++i)
+			EXPECT_TRUE(comp_pair(*myMap.upper_bound(i), *stdMap.upper_bound(i)));
+		EXPECT_TRUE(comp_pair(*(--myMap.upper_bound(42)), *(--stdMap.upper_bound(42))));
 	}
-	*/
+
+
+	TEST(MapBasicTest, EqualRangeMethod)
+	{
+		ft::map< int, int > myMap;
+		std::map< int, int > stdMap;
+
+		for (int i = 0; i < 20;)
+		{	
+			myMap.insert(ft::make_pair(i, i));
+			stdMap.insert(std::make_pair(i, i));
+			i += 4;
+		}
+
+		EXPECT_TRUE((myMap.equal_range(7).first == myMap.lower_bound(7)) == (stdMap.equal_range(7).first == stdMap.lower_bound(7)));
+		EXPECT_TRUE((myMap.equal_range(7).second == myMap.upper_bound(7)) == (stdMap.equal_range(7).second == stdMap.upper_bound(7)));
+	}
 }  // namespace
