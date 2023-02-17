@@ -5,6 +5,7 @@
 #include <utility>
 #include <list>
 #include <map>
+#include <time.h>
 
 /*
  * [ google test v1.8.1 in use for compatibility reasons ]
@@ -158,6 +159,48 @@ namespace {
 		EXPECT_TRUE(m2 <= m3);
 	}
 
+	TEST(MapBasicTest, InsertMethod2)
+	{
+		ft::map< int, int > myMap;
+		std::map< int, int > stdMap;
+		srand((unsigned)time(NULL));
+
+		int tab[10] = { 1378, 4719, 112, 444444, 1010, 287676, 2111120, 338337, 47187, 4 };
+		for (int i = 0; i < 10; ++i)
+		{
+			myMap.insert(ft::make_pair(tab[i], 0));
+			stdMap.insert(std::make_pair(tab[i], 0));
+		}
+		myMap.insert(ft::make_pair(42, 42));
+		stdMap.insert(std::make_pair(42, 42));
+
+		myMap.insert(myMap.find(42), ft::make_pair(43, 43));
+		stdMap.insert(stdMap.find(42), std::make_pair(43, 43));
+		EXPECT_TRUE(myMap.get_allocator() == stdMap.get_allocator());
+		EXPECT_TRUE(myMap.empty() == stdMap.empty());
+		EXPECT_EQ(myMap.size(), stdMap.size());
+		EXPECT_EQ(myMap.max_size(), stdMap.max_size());
+		for (int i = 0; i < 10; ++i)
+		{
+			EXPECT_EQ(myMap.count(tab[i]), stdMap.count(tab[i]));
+			EXPECT_EQ(myMap.find(tab[i])->first, stdMap.find(tab[i])->first);
+			EXPECT_EQ(myMap.at(tab[i]), stdMap.at(tab[i]));
+			EXPECT_EQ(myMap[tab[i]], stdMap[tab[i]]);
+		}
+		EXPECT_EQ((--myMap.find(404))->first, (--stdMap.find(404))->first);
+		EXPECT_EQ(myMap.count(404), stdMap.count(404));
+
+		EXPECT_TRUE(comp_pair(*myMap.begin(), *stdMap.begin()));
+		EXPECT_TRUE(comp_pair(*(--myMap.end()), *(--stdMap.end())));
+		EXPECT_TRUE(comp_pair(*myMap.rbegin(), *stdMap.rbegin()));
+		EXPECT_TRUE(comp_pair(*(--(myMap.rend())), *(--stdMap.rend())));
+		EXPECT_TRUE((myMap == myMap) ==  (stdMap == stdMap));
+		EXPECT_TRUE((myMap != myMap) ==  (stdMap != stdMap));
+		EXPECT_TRUE((myMap < myMap) ==  (stdMap < stdMap));
+		EXPECT_TRUE((myMap <= myMap) ==  (stdMap <= stdMap));
+		EXPECT_TRUE((myMap > myMap) ==  (stdMap > stdMap));
+		EXPECT_TRUE((myMap >= myMap) ==  (stdMap >= stdMap));
+	}
 
 	TEST(MapBasicTest, Iterators)
 	{
