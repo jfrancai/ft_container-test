@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <gtest/gtest-typed-test.h>
 #include <gtest/gtest.h>
-#include "../vector.hpp"
+#include "../include/vector.hpp"
 #include <list>
 
 /*

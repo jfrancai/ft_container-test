@@ -46,6 +46,19 @@ namespace {
 		EXPECT_EQ(myMap[""], stdMap[""]);
 	}
 
+	TEST(MapBasicTest, CopyConstructor)
+	{
+		ft::map< int, std::string > m0;
+		ft::map< int, std::string > m1;
+
+		for (int i = 0; i < 10; ++i)
+			m0.insert(ft::make_pair(i, "toto"));
+
+		EXPECT_FALSE(m0 == m1);
+		m1 = m0;
+		EXPECT_TRUE(m0 == m1);
+	}
+
 	TEST(MapBasicTest, DISABLED_SegfaultTest)
 	{
 		ft::map< std::string, int > myMap;
