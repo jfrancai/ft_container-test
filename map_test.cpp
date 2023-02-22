@@ -341,11 +341,6 @@ namespace {
 		EXPECT_TRUE(p3 <= p1);
 	}
 
-	int	&ref_wrap(int &n)
-	{
-		return (n);
-	}
-
 	template<typename T>
 	class reference_wrapper {
 	public:

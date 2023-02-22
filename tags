@@ -1,0 +1,136 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/mnt/nfs/homes/jfrancai/repos/42/ft_container/test/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	//
+ModCmp	map_test.cpp	/^	struct ModCmp {$/;"	s	namespace:__anon384d58930111	file:
+MyTypes	vector_test.cpp	/^	typedef testing::Types< int > MyTypes;$/;"	t	namespace:__anon77a260480111	typeref:typename:testing::Types<int>	file:
+MyTypes	vector_test.cpp	/^	typedef testing::Types< int, float, double, char, wchar_t> MyTypes;$/;"	t	namespace:__anon77a260480111	typeref:typename:testing::Types<int,float,double,char,wchar_t>	file:
+SetUp	vector_test.cpp	/^			void SetUp()$/;"	f	class:__anon77a260480111::VectorTest	typeref:typename:void	file:
+SetUp	vector_test.cpp	/^			void SetUp()$/;"	f	class:__anon77a260480111::VectorTestString	typeref:typename:void	file:
+StringTypes	vector_test.cpp	/^	typedef testing::Types< std::string > StringTypes;$/;"	t	namespace:__anon77a260480111	typeref:typename:testing::Types<std::string>	file:
+TEST	map_test.cpp	/^	TEST(MakePairTest, CanCreatePairWithMakePair)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, Comparators)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, CopyConstructor)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, DISABLED_SegfaultTest)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, DefaultConstructor)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, EqualRangeMethod)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, InsertMethod1)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, InsertMethod2)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, Iterators)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, LowerBoundMethod)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, OperatorEqual)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, UpperBoundMethod)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(MapBasicTest, valueComp)$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(PairTest, CanAccessPairElements) {$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(PairTest, CanAssignPair) {$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(PairTest, CanComparePairs) {$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(PairTest, CanCopyConstructPair) {$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(PairTest, CanCreateDefaultPair) {$/;"	f	namespace:__anon384d58930111
+TEST	map_test.cpp	/^	TEST(PairTest, CanCreatePairWithValues) {$/;"	f	namespace:__anon384d58930111
+TEST	redblacktree_test.cpp	/^	TEST(TestRBTree, AssignmentOperator) {$/;"	f	namespace:__anon6d830e7d0111
+TEST	redblacktree_test.cpp	/^	TEST(TestRBTree, BasicDeletionOfRedNode)$/;"	f	namespace:__anon6d830e7d0111
+TEST	redblacktree_test.cpp	/^	TEST(TestRBTree, BasicLeftInsertion) {$/;"	f	namespace:__anon6d830e7d0111
+TEST	redblacktree_test.cpp	/^	TEST(TestRBTree, BasicLeftRotation) {$/;"	f	namespace:__anon6d830e7d0111
+TEST	redblacktree_test.cpp	/^	TEST(TestRBTree, BasicRightInsertion) {$/;"	f	namespace:__anon6d830e7d0111
+TEST	redblacktree_test.cpp	/^	TEST(TestRBTree, BasicRightRotation) {$/;"	f	namespace:__anon6d830e7d0111
+TEST	redblacktree_test.cpp	/^	TEST(TestRBTree, BasicValid)$/;"	f	namespace:__anon6d830e7d0111
+TEST	redblacktree_test.cpp	/^	TEST(TestRBTree, CopyConstructor) {$/;"	f	namespace:__anon6d830e7d0111
+TEST	redblacktree_test.cpp	/^	TEST(TestRBTree, IsExisting) {$/;"	f	namespace:__anon6d830e7d0111
+TEST	stack_test.cpp	/^	TEST(StackTest, AssignmentOperator)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, ContainerConstructor)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, DefaultConstructor)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, EqualityOperator)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, GreaterThanEqualOperator)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, GreaterThanOperator)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, InEqualityOperator)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, LessThanEqualOperator)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, LessThanOperator)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, PopMethod)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, PushMethod)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	stack_test.cpp	/^	TEST(StackTest, TopMethod)$/;"	f	namespace:__anon2c16f3eb0111
+TEST	type_traits_test.cpp	/^	TEST(IsIntegralTest, BasicTypes)$/;"	f	namespace:__anondfff3e4d0111
+TEST	type_traits_test.cpp	/^	TEST(IsIntegralTest, NonIntegralTypes)$/;"	f	namespace:__anondfff3e4d0111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, AssignMethod1)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, AssignMethod2)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, AssignmentOperator)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, ClearMethod)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, Comparators)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, ConstLegacyRandomAccessIterator)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, CopyConstructor)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, CountConstructor)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, DefaultConstructor)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, InsertMethod1)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, InsertMethod2_0)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, InsertMethod3)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, IteratorConstructor)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, LegacyRandomAccessIterator)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, PopBackMethod)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, PushBackMethod)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, ReserveMethod)$/;"	f	namespace:__anon77a260480111
+TEST	vector_test.cpp	/^	TEST(VectorBasicTest, ResizeMethod)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, DISABLED_TestSIGNAL)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, InsertTest0)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, InsertTest1)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, NonMemberFunction)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, NonMemberSwap)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, ReverseIteratorTest)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestAt)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestBack)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestCapacity)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestCapacitySize)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestClear)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestCopyConstructor_IsExisting)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestCountConstructor)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestData)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestDefaultConstructor)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestEmpty)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestErase)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestEraseFirstLast)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestFront)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestGetAllocator)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestIterators)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestMaxSize)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestModifierPopBack)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestOperatorElementAccess)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestReserve_Allocation)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestReserve_CapacityUpdates)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestReserve_IsExisting)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestResize)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest, TestSwap)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTest,TestErasePos)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTestString, TestStringDefaultConstructor)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTestString, TestStringPushBack)$/;"	f	namespace:__anon77a260480111
+TYPED_TEST	vector_test.cpp	/^	TYPED_TEST(VectorTestString, TestStringSize)$/;"	f	namespace:__anon77a260480111
+TearDown	vector_test.cpp	/^			void TearDown()$/;"	f	class:__anon77a260480111::VectorTest	typeref:typename:void	file:
+TearDown	vector_test.cpp	/^			void TearDown()$/;"	f	class:__anon77a260480111::VectorTestString	typeref:typename:void	file:
+Vector	vector_test.cpp	/^			typedef ft::vector< Type >					Vector;$/;"	t	class:__anon77a260480111::VectorTest	typeref:typename:ft::vector<Type>	file:
+Vector	vector_test.cpp	/^			typedef ft::vector<Type> Vector;$/;"	t	class:__anon77a260480111::VectorTestString	typeref:typename:ft::vector<Type>	file:
+VectorTest	vector_test.cpp	/^			VectorTest()$/;"	f	class:__anon77a260480111::VectorTest	file:
+VectorTest	vector_test.cpp	/^	class VectorTest : public testing::Test$/;"	c	namespace:__anon77a260480111	file:
+VectorTestString	vector_test.cpp	/^	class VectorTestString: public testing::Test$/;"	c	namespace:__anon77a260480111	file:
+__anon2c16f3eb0111	stack_test.cpp	/^namespace {$/;"	n	file:
+__anon384d58930111	map_test.cpp	/^namespace {$/;"	n	file:
+__anon6d830e7d0111	redblacktree_test.cpp	/^namespace {$/;"	n	file:
+__anon77a260480111	vector_test.cpp	/^namespace {$/;"	n	file:
+__anondfff3e4d0111	type_traits_test.cpp	/^namespace {$/;"	n	file:
+comp_pair	map_test.cpp	/^	bool comp_pair(const ft::pair< T1, T2 > &p1, const std::pair< T1, T2 > &p2)$/;"	f	namespace:__anon384d58930111	typeref:typename:bool
+lenv2	vector_test.cpp	/^	const static int lenv2 = 7;$/;"	v	namespace:__anon77a260480111	typeref:typename:const int	file:
+operator ()	map_test.cpp	/^		bool operator()(const int lhs, const int rhs) const$/;"	f	struct:__anon384d58930111::ModCmp	typeref:typename:bool	file:
+operator T&	map_test.cpp	/^	    operator T&() const { return *ref; }$/;"	f	class:__anon384d58930111::reference_wrapper	file:
+ref	map_test.cpp	/^	    T* ref;$/;"	m	class:__anon384d58930111::reference_wrapper	typeref:typename:T *	file:
+ref	map_test.cpp	/^	reference_wrapper<T> ref(T& value) {$/;"	f	namespace:__anon384d58930111	typeref:typename:reference_wrapper<T>
+reference_wrapper	map_test.cpp	/^	    reference_wrapper(T& value) : ref(&value) {}$/;"	f	class:__anon384d58930111::reference_wrapper	file:
+reference_wrapper	map_test.cpp	/^	class reference_wrapper {$/;"	c	namespace:__anon384d58930111	file:
+v0_	vector_test.cpp	/^			Vector	v0_;$/;"	m	class:__anon77a260480111::VectorTest	typeref:typename:Vector	file:
+v1_	vector_test.cpp	/^			Vector	v1_;$/;"	m	class:__anon77a260480111::VectorTest	typeref:typename:Vector	file:
+v2_	vector_test.cpp	/^			Vector	v2_;$/;"	m	class:__anon77a260480111::VectorTest	typeref:typename:Vector	file:
+v4_	vector_test.cpp	/^			Vector v4_;$/;"	m	class:__anon77a260480111::VectorTestString	typeref:typename:Vector	file:
+v5_	vector_test.cpp	/^			Vector v5_;$/;"	m	class:__anon77a260480111::VectorTestString	typeref:typename:Vector	file:
+witnessEmptyVect	vector_test.cpp	/^			std::vector< Type >	witnessEmptyVect;$/;"	m	class:__anon77a260480111::VectorTest	typeref:typename:std::vector<Type>	file:
