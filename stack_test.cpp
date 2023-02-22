@@ -10,7 +10,7 @@ namespace {
 	{
 		ft::stack< int > s;
 		EXPECT_TRUE(s.empty());
-		EXPECT_EQ(s.size(), 0);
+		EXPECT_EQ(s.size(), size_t(0));
 	}
 
 	TEST(StackTest, ContainerConstructor)
@@ -21,7 +21,7 @@ namespace {
 		v.push_back(3);
 		ft::stack< int, ft::vector< int > > s(v);
 		EXPECT_FALSE(s.empty());
-		EXPECT_EQ(s.size(), 3);
+		EXPECT_EQ(s.size(), size_t(3));
 		EXPECT_EQ(s.top(), 3);
 
 		std::list< int > l;
@@ -30,7 +30,7 @@ namespace {
 		l.push_back(6);
 		ft::stack< int, std::list< int > > s2(l);
 		EXPECT_FALSE(s2.empty());
-		EXPECT_EQ(s2.size(), 3);
+		EXPECT_EQ(s2.size(), size_t(3));
 		EXPECT_EQ(s2.top(), 6);
 	}
 
@@ -50,15 +50,15 @@ namespace {
 	TEST(StackTest, PushMethod)
 	{
 		ft::stack< int > s;
-		EXPECT_EQ(s.size(), 0);
+		EXPECT_EQ(s.size(), size_t(0));
 		s.push(1);
-		EXPECT_EQ(s.size(), 1);
+		EXPECT_EQ(s.size(), size_t(1));
 		EXPECT_EQ(s.top(), 1);
 		s.push(2);
-		EXPECT_EQ(s.size(), 2);
+		EXPECT_EQ(s.size(), size_t(2));
 		EXPECT_EQ(s.top(), 2);
 		s.push(3);
-		EXPECT_EQ(s.size(), 3);
+		EXPECT_EQ(s.size(), size_t(3));
 		EXPECT_EQ(s.top(), 3);
 	}
 
@@ -68,17 +68,17 @@ namespace {
 		s.push(1);
 		s.push(2);
 		s.push(3);
-		EXPECT_EQ(s.size(), 3);
+		EXPECT_EQ(s.size(), size_t(3));
 		EXPECT_EQ(s.top(), 3);
 		s.pop();
-		EXPECT_EQ(s.size(), 2);
+		EXPECT_EQ(s.size(), size_t(2));
 		EXPECT_EQ(s.top(), 2);
 		s.pop();
-		EXPECT_EQ(s.size(), 1);
+		EXPECT_EQ(s.size(), size_t(1));
 		EXPECT_EQ(s.top(), 1);
 		s.pop();
 		EXPECT_TRUE(s.empty());
-		EXPECT_EQ(s.size(), 0);
+		EXPECT_EQ(s.size(), size_t(0));
 	}
 
 	TEST(StackTest, AssignmentOperator)
@@ -91,13 +91,13 @@ namespace {
 		ft::stack< int > s2;
 
 		s2 = s1;
-		EXPECT_EQ(s2.size(), 3);
+		EXPECT_EQ(s2.size(), size_t(3));
 		EXPECT_EQ(s2.top(), 3);
 
 		s1.pop();
-		EXPECT_EQ(s1.size(), 2);
+		EXPECT_EQ(s1.size(), size_t(2));
 		EXPECT_EQ(s1.top(), 2);
-		EXPECT_EQ(s2.size(), 3);
+		EXPECT_EQ(s2.size(), size_t(3));
 		EXPECT_EQ(s2.top(), 3);
 	}
 
