@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
-#include "../include/map.hpp"
-#include "../include/utility.hpp"
+#include <map.hpp>
+#include <utility.hpp>
 #include <utility>
 #include <list>
 #include <map>
