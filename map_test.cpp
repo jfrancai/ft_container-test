@@ -59,13 +59,13 @@ namespace {
 		EXPECT_TRUE(m0 == m1);
 	}
 
-	TEST(MapBasicTest, DISABLED_SegfaultTest)
-	{
-		ft::map< std::string, int > myMap;
-		EXPECT_EXIT({
-			 std::cout << (*myMap.find("")).first;
-		 }, testing::KilledBySignal(SIGSEGV), ".*");
-	}
+//	TEST(MapBasicTest, DISABLED_SegfaultTest)
+//	{
+//		ft::map< std::string, int > myMap;
+//		EXPECT_EXIT({
+//			 std::cout << (*myMap.find("")).first;
+//		 }, testing::KilledBySignal(SIGSEGV), ".*");
+//	}
 
 
 	TEST(MapBasicTest, InsertMethod1)
